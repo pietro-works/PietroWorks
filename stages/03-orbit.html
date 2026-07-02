@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Stage 03 · The orbit — pietro.works showcase</title>
+    <meta
+      name="description"
+      content="The How I work animation from pietro.works, isolated: a still portrait while the system assembles around it in a 9.6 second pure-CSS cycle."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://api.fontshare.com" rel="preconnect" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared.css" />
+    <style>
+      /* ================================================================
+         The exhibit: the "How I work" orbit, verbatim production CSS,
+         including the constellation SVG's display:none. See note 05.
+         ================================================================ */
+      .origin-visual {
+        isolation: isolate;
+        --origin-cycle: 9.6s;
+        --origin-quint: cubic-bezier(0.16, 1, 0.3, 1);
+        align-items: center;
+        justify-items: center;
+        min-height: 420px;
+        width: min(400px, 100%);
+        margin: 0 auto;
+        display: grid;
+        position: relative;
+      }
+      .origin-visual:before,
+      .origin-visual:after {
+        content: "";
+        pointer-events: none;
+        border-radius: 50%;
+        position: absolute;
+      }
+      .origin-visual:before {
+        border: 1px solid rgba(57, 232, 255, 0.18);
+        width: min(380px, 78vw);
+        height: min(380px, 78vw);
+        transform: rotate(-14deg) scaleX(1.08);
+        box-shadow:
+          0 0 58px rgba(57, 232, 255, 0.12),
+          inset 0 0 44px rgba(0, 255, 153, 0.05);
+      }
+      .origin-visual:after {
+        filter: blur(16px);
+        opacity: 0.48;
+        background: conic-gradient(
+          from 150deg,
+          rgba(57, 232, 255, 0.38),
+          transparent 24%,
+          rgba(0, 255, 153, 0.28),
+          transparent 54%,
+          rgba(168, 85, 247, 0.32),
+          transparent 82%,
+          rgba(57, 232, 255, 0.28)
+        );
+        width: min(310px, 66vw);
+        height: min(310px, 66vw);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .origin-visual:after {
+          animation: 18s linear infinite avatarSpin;
+        }
+      }
+      @keyframes avatarSpin {
+        to {
+          rotate: 360deg;
+        }
+      }
+      .origin-photo-shell {
+        z-index: 3;
+        aspect-ratio: 1;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 50%;
+        width: max(190px, min(22vw, 260px));
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 0 0 1px rgba(57, 232, 255, 0.28),
+          0 0 0 10px rgba(57, 232, 255, 0.043),
+          0 28px 80px rgba(0, 0, 0, 0.52),
+          0 0 68px rgba(57, 232, 255, 0.14);
+      }
+      .origin-photo-shell img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .origin-constellation {
+        /* Matches production: display:none. A retired layer from the
+           animation's build process, never meant to render. See note 05. */
+        display: none;
+        z-index: 5;
+        opacity: 0;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        inset: 0;
+        overflow: visible;
+      }
+      .origin-link {
+        fill: none;
+        stroke: rgba(57, 232, 255, 0.64);
+        stroke-width: 1.45px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1px;
+        filter: drop-shadow(0 0 6px rgba(57, 232, 255, 0.48))
+          drop-shadow(0 0 16px rgba(57, 232, 255, 0.18));
+        opacity: 0;
+        animation: originLinkA var(--origin-cycle) ease-in-out infinite;
+      }
+      .origin-link-b {
+        animation-name: originLinkB;
+      }
+      .origin-link-c {
+        stroke: rgba(0, 255, 153, 0.58);
+        animation-name: originLinkC;
+      }
+      .origin-signal,
+      .origin-tax-meter {
+        border: 1px solid var(--line-s);
+        opacity: 0;
+        animation-duration: var(--origin-cycle);
+        animation-timing-function: var(--origin-quint);
+        background: rgba(6, 10, 18, 0.78);
+        border-radius: 999px;
+        animation-iteration-count: infinite;
+        position: absolute;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+      }
+      .origin-signal {
+        z-index: 6;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 158px;
+        padding: 9px 13px;
+        display: flex;
+      }
+      .origin-signal:before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        animation-duration: var(--origin-cycle);
+        background: #ff4d5f;
+        border-radius: 50%;
+        animation-timing-function: step-end;
+        animation-iteration-count: infinite;
+        position: absolute;
+        top: 50%;
+        left: 13px;
+        transform: translateY(-50%);
+        box-shadow: 0 0 12px rgba(255, 77, 95, 0.72);
+      }
+      .origin-signal strong {
+        color: var(--ink);
+        padding-left: 14px;
+        font-size: 12px;
+        line-height: 1;
+      }
+      .origin-signal span {
+        color: var(--dim);
+        padding-left: 14px;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+      }
+      .origin-signal-a {
+        --tx: -50%;
+        --ty: 0px;
+        --start-x: 0px;
+        --start-y: 132px;
+        --mid-x: 0px;
+        --mid-y: 62px;
+        --out-x: 0px;
+        --out-y: -42px;
+        --burst-x: 0px;
+        --burst-y: -132px;
+        animation-name: originSignalA;
+        top: 18px;
+        left: 50%;
+        transform: translate(-50%);
+      }
+      .origin-signal-b {
+        --tx: 0px;
+        --ty: 0px;
+        --start-x: 122px;
+        --start-y: -90px;
+        --mid-x: 56px;
+        --mid-y: -42px;
+        --out-x: -46px;
+        --out-y: 34px;
+        --burst-x: -148px;
+        --burst-y: 110px;
+        animation-name: originSignalB;
+        top: 230px;
+        left: 2px;
+      }
+      .origin-signal-c {
+        --tx: 0px;
+        --ty: 0px;
+        --start-x: -122px;
+        --start-y: -90px;
+        --mid-x: -56px;
+        --mid-y: -42px;
+        --out-x: 46px;
+        --out-y: 34px;
+        --burst-x: 148px;
+        --burst-y: 110px;
+        animation-name: originSignalC;
+        top: 230px;
+        right: 2px;
+      }
+      .origin-signal-a:before {
+        animation-name: originDotA;
+      }
+      .origin-signal-b:before {
+        animation-name: originDotB;
+      }
+      .origin-signal-c:before {
+        animation-name: originDotC;
+      }
+      .origin-tax-meter {
+        z-index: 4;
+        --tx: -50%;
+        --ty: 0px;
+        --start-x: 0px;
+        --start-y: -74px;
+        --mid-x: 0px;
+        --mid-y: -34px;
+        --out-x: 0px;
+        --out-y: 34px;
+        --burst-x: 0px;
+        --burst-y: 96px;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        animation-name: originMeterNode;
+        display: flex;
+        bottom: 18px;
+        left: 50%;
+        transform: translate(-50%);
+      }
+      .origin-tax-meter span {
+        color: var(--cyan);
+        white-space: nowrap;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+      }
+      .origin-tax-meter i {
+        width: 62px;
+        height: 4px;
+        animation: originMeterGlow var(--origin-cycle) ease-in-out infinite;
+        background: rgba(57, 232, 255, 0.12);
+        border-radius: 999px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 0 0 1px rgba(57, 232, 255, 0.08);
+      }
+      .origin-tax-meter i:before {
+        content: "";
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), var(--green));
+        transform-origin: 0;
+        width: 100%;
+        animation: originMeterFill var(--origin-cycle) linear infinite;
+        position: absolute;
+        inset: 0;
+        transform: scaleX(0);
+        box-shadow:
+          0 0 18px rgba(57, 232, 255, 0.55),
+          0 0 36px rgba(0, 255, 153, 0.32);
+      }
+
+      /* ---- production keyframes, unedited ---- */
+      @keyframes originSignalA {
+        0%,
+        12% {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--start-x)),
+              calc(var(--ty) + var(--start-y))
+            )
+            scale(0.72);
+        }
+        17% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.045);
+        }
+        21%,
+        70% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1);
+        }
+        74% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.02);
+        }
+        79% {
+          opacity: 0.98;
+          transform: translate(
+              calc(var(--tx) + var(--out-x)),
+              calc(var(--ty) + var(--out-y))
+            )
+            scale(1.08);
+        }
+        84% {
+          opacity: 0.68;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.84);
+        }
+        90%,
+        to {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.46);
+        }
+      }
+      @keyframes originSignalC {
+        0%,
+        21% {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--start-x)),
+              calc(var(--ty) + var(--start-y))
+            )
+            scale(0.72);
+        }
+        26% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.04);
+        }
+        30%,
+        70% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1);
+        }
+        74% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.02);
+        }
+        79% {
+          opacity: 0.98;
+          transform: translate(
+              calc(var(--tx) + var(--out-x)),
+              calc(var(--ty) + var(--out-y))
+            )
+            scale(1.08);
+        }
+        84% {
+          opacity: 0.68;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.84);
+        }
+        90%,
+        to {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.46);
+        }
+      }
+      @keyframes originSignalB {
+        0%,
+        30% {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--start-x)),
+              calc(var(--ty) + var(--start-y))
+            )
+            scale(0.72);
+        }
+        35% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.04);
+        }
+        39%,
+        70% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1);
+        }
+        74% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.02);
+        }
+        79% {
+          opacity: 0.98;
+          transform: translate(
+              calc(var(--tx) + var(--out-x)),
+              calc(var(--ty) + var(--out-y))
+            )
+            scale(1.08);
+        }
+        84% {
+          opacity: 0.68;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.84);
+        }
+        90%,
+        to {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.46);
+        }
+      }
+      @keyframes originMeterNode {
+        0%,
+        2% {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--start-x)),
+              calc(var(--ty) + var(--start-y))
+            )
+            scale(0.72);
+        }
+        8% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.035);
+        }
+        12%,
+        70% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1);
+        }
+        74% {
+          opacity: 1;
+          transform: translate(var(--tx), var(--ty)) scale(1.02);
+        }
+        79% {
+          opacity: 0.98;
+          transform: translate(
+              calc(var(--tx) + var(--out-x)),
+              calc(var(--ty) + var(--out-y))
+            )
+            scale(1.08);
+        }
+        84% {
+          opacity: 0.68;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.84);
+        }
+        90%,
+        to {
+          opacity: 0;
+          transform: translate(
+              calc(var(--tx) + var(--burst-x)),
+              calc(var(--ty) + var(--burst-y))
+            )
+            scale(0.46);
+        }
+      }
+      @keyframes originLinkA {
+        0%,
+        31% {
+          opacity: 0;
+          stroke-dashoffset: 1px;
+        }
+        40%,
+        70% {
+          opacity: 0.72;
+          stroke-dashoffset: 0;
+        }
+        78% {
+          opacity: 0.28;
+          stroke-dashoffset: 0;
+        }
+        90%,
+        to {
+          opacity: 0;
+          stroke-dashoffset: 1px;
+        }
+      }
+      @keyframes originLinkB {
+        0%,
+        22% {
+          opacity: 0;
+          stroke-dashoffset: 1px;
+        }
+        31%,
+        70% {
+          opacity: 0.7;
+          stroke-dashoffset: 0;
+        }
+        78% {
+          opacity: 0.28;
+          stroke-dashoffset: 0;
+        }
+        90%,
+        to {
+          opacity: 0;
+          stroke-dashoffset: 1px;
+        }
+      }
+      @keyframes originLinkC {
+        0%,
+        35% {
+          opacity: 0;
+          stroke-dashoffset: 1px;
+        }
+        44%,
+        70% {
+          opacity: 0.62;
+          stroke-dashoffset: 0;
+        }
+        78% {
+          opacity: 0.26;
+          stroke-dashoffset: 0;
+        }
+        90%,
+        to {
+          opacity: 0;
+          stroke-dashoffset: 1px;
+        }
+      }
+      @keyframes originMeterFill {
+        0%,
+        8% {
+          filter: brightness();
+          transform: scaleX(0);
+        }
+        39% {
+          filter: brightness(1.15) drop-shadow(0 0 10px rgba(57, 232, 255, 0.74));
+          transform: scaleX(1);
+        }
+        50%,
+        70% {
+          filter: brightness(1.65) drop-shadow(0 0 8px rgba(57, 232, 255, 0.9))
+            drop-shadow(0 0 18px rgba(0, 255, 153, 0.78))
+            drop-shadow(0 0 30px rgba(0, 255, 153, 0.42));
+          transform: scaleX(1);
+        }
+        90%,
+        to {
+          filter: brightness();
+          transform: scaleX(1);
+        }
+      }
+      @keyframes originMeterGlow {
+        0%,
+        8%,
+        90%,
+        to {
+          filter: none;
+          box-shadow: inset 0 0 0 1px rgba(57, 232, 255, 0.08);
+        }
+        39% {
+          filter: drop-shadow(0 0 8px rgba(57, 232, 255, 0.58));
+          box-shadow:
+            inset 0 0 0 1px rgba(57, 232, 255, 0.14),
+            0 0 14px rgba(57, 232, 255, 0.26);
+        }
+        50%,
+        70% {
+          filter: drop-shadow(0 0 10px rgba(57, 232, 255, 0.82))
+            drop-shadow(0 0 22px rgba(0, 255, 153, 0.62))
+            drop-shadow(0 0 42px rgba(0, 255, 153, 0.3));
+          box-shadow:
+            inset 0 0 0 1px rgba(57, 232, 255, 0.22),
+            0 0 18px rgba(57, 232, 255, 0.42),
+            0 0 34px rgba(0, 255, 153, 0.28);
+        }
+      }
+      @keyframes originDotA {
+        0%,
+        12.4% {
+          opacity: 0;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+        12.8%,
+        14%,
+        15.3%,
+        16.4% {
+          opacity: 1;
+          background: #ff4d5f;
+          box-shadow: 0 0 13px rgba(255, 77, 95, 0.76);
+        }
+        13.4%,
+        14.7%,
+        15.9% {
+          opacity: 0.14;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+        17.8%,
+        70% {
+          opacity: 1;
+          background: var(--green);
+          box-shadow: 0 0 14px rgba(0, 255, 153, 0.72);
+        }
+        90%,
+        to {
+          opacity: 0;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+      }
+      @keyframes originDotC {
+        0%,
+        21.4% {
+          opacity: 0;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+        21.8%,
+        23%,
+        24.3%,
+        25.4% {
+          opacity: 1;
+          background: #ff4d5f;
+          box-shadow: 0 0 13px rgba(255, 77, 95, 0.76);
+        }
+        22.4%,
+        23.7%,
+        24.9% {
+          opacity: 0.14;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+        26.8%,
+        70% {
+          opacity: 1;
+          background: var(--green);
+          box-shadow: 0 0 14px rgba(0, 255, 153, 0.72);
+        }
+        90%,
+        to {
+          opacity: 0;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+      }
+      @keyframes originDotB {
+        0%,
+        30.4% {
+          opacity: 0;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+        30.8%,
+        32%,
+        33.3%,
+        34.4% {
+          opacity: 1;
+          background: #ff4d5f;
+          box-shadow: 0 0 13px rgba(255, 77, 95, 0.76);
+        }
+        31.4%,
+        32.7%,
+        33.9% {
+          opacity: 0.14;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+        35.8%,
+        70% {
+          opacity: 1;
+          background: var(--green);
+          box-shadow: 0 0 14px rgba(0, 255, 153, 0.72);
+        }
+        90%,
+        to {
+          opacity: 0;
+          box-shadow: none;
+          background: #ff4d5f;
+        }
+      }
+
+      /* ---- phase bar (showcase furniture, synced to the same clock) ---- */
+      .phase-bar {
+        margin-top: 26px;
+      }
+      .phase-track {
+        border: 1px solid var(--line);
+        background: rgba(6, 10, 18, 0.5);
+        border-radius: 999px;
+        height: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+      .phase-fill {
+        position: absolute;
+        inset: 0;
+        transform-origin: 0;
+        transform: scaleX(0);
+        background: linear-gradient(90deg, rgba(57, 232, 255, 0.5), rgba(0, 255, 153, 0.5));
+        border-radius: inherit;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .phase-fill {
+          animation: phaseSweep 9.6s linear infinite;
+        }
+      }
+      @keyframes phaseSweep {
+        0% {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+      .phase-labels {
+        display: grid;
+        grid-template-columns: 12fr 18fr 14fr 26fr 20fr 10fr;
+        margin-top: 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 9.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--dim);
+      }
+      .phase-labels span {
+        border-left: 1px solid var(--line-s);
+        padding-left: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      @media (max-width: 560px) {
+        .phase-labels {
+          font-size: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div aria-hidden="true" class="ambient ambient-a"></div>
+    <div aria-hidden="true" class="ambient ambient-b"></div>
+    <div aria-hidden="true" class="scanline"></div>
+
+    <header class="sc-top">
+      <div class="wrap">
+        <a class="sc-brand" href="../index.html">Pietro<sup>.works/showcase</sup></a>
+        <nav class="sc-crumb" aria-label="Stages">
+          <a href="../index.html">index</a>
+          <span class="sc-sep">·</span>
+          <a href="01-accent.html">01</a>
+          <a href="02-atoms.html">02</a>
+          <a href="03-orbit.html" aria-current="page">03</a>
+          <a href="04-review-queue.html">04</a>
+          <a href="05-modules.html">05</a>
+          <a href="06-flip.html">06</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="band band--hero">
+        <div class="wrap">
+          <div class="stage-hero">
+            <div class="eyebrow"><span class="dot"></span> stage_03 · highlight</div>
+            <h1>The system assembles around the person</h1>
+            <p class="sub">
+              In the "How I work" section, the portrait never moves. Everything else
+              does. Three signal chips fly in and boot up, an orchestration meter
+              charges, and then the whole apparatus bursts away and rebuilds. The
+              argument of the entire site, played as a 9.6 second loop of pure CSS.
+              No JavaScript touches this scene.
+            </p>
+          </div>
+
+          <figure class="pedestal pedestal--grid" aria-label="The orbit animation, isolated and running">
+            <span class="pedestal-tick pedestal-tick--tl">how-i-work / visual</span>
+            <span class="pedestal-tick pedestal-tick--br">cycle 9.6s · css only</span>
+            <div class="origin-visual">
+              <svg
+                class="origin-constellation"
+                focusable="false"
+                preserveAspectRatio="none"
+                viewBox="0 0 360 360"
+                aria-hidden="true"
+              >
+                <path class="origin-link origin-link-a" d="M180 18L2 251" pathLength="1"></path>
+                <path class="origin-link origin-link-b" d="M180 18L358 251" pathLength="1"></path>
+                <path class="origin-link origin-link-c" d="M2 251L358 251" pathLength="1"></path>
+              </svg>
+              <div class="origin-photo-shell">
+                <img
+                  alt="Pietro Impagliazzo"
+                  decoding="async"
+                  height="560"
+                  loading="lazy"
+                  sizes="260px"
+                  src="../assets/pietro-works-320.webp"
+                  srcset="
+                    ../assets/pietro-works-320.webp 320w,
+                    ../assets/pietro-works-560.webp 560w
+                  "
+                  width="560"
+                />
+              </div>
+              <div class="origin-signal origin-signal-a">
+                <strong>Context Layer</strong> <span>inputs attached</span>
+              </div>
+              <div class="origin-signal origin-signal-b">
+                <strong>Verified Output</strong> <span>human-approved sync</span>
+              </div>
+              <div class="origin-signal origin-signal-c">
+                <strong>AI Handoff</strong> <span>structured prompt</span>
+              </div>
+              <div class="origin-tax-meter"><span>orchestration layer</span> <i></i></div>
+            </div>
+
+            <div class="phase-bar" aria-hidden="true">
+              <div class="phase-track"><div class="phase-fill"></div></div>
+              <div class="phase-labels">
+                <span>boot</span>
+                <span>signals in</span>
+                <span>linked</span>
+                <span>hold</span>
+                <span>burst</span>
+                <span>reset</span>
+              </div>
+            </div>
+          </figure>
+
+          <div class="readout" role="note">
+            <b>cycle 9.6s</b><i>·</i><b>3 signals · staggered 12 / 21 / 30%</b><i>·</i>
+            <b>quint-out arrivals</b><i>·</i><b>meter sweep cyan→green</b><i>·</i>
+            <b>0 lines of JS</b>
+          </div>
+
+          <div class="notes">
+            <div class="note" data-reveal>
+              <span class="n-index">note / 01</span>
+              <h3>Signals boot like hardware</h3>
+              <p>
+                Watch the dot on each chip as it lands: it flickers red four times on
+                a <code>step-end</code> clock, then settles green. Status is earned on
+                screen, not assumed. It is the smallest storytelling beat on the site
+                and the one people remember.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 02</span>
+              <h3>One clock, many instruments</h3>
+              <p>
+                Every element animates against the same
+                <code>--origin-cycle: 9.6s</code> custom property. Arrival order, the
+                meter's charge and the shared burst all read one variable, so
+                retiming the whole scene is a one-line edit.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 03</span>
+              <h3>The exit is choreography, not a cut</h3>
+              <p>
+                From 74% each chip leans out along its own vector, then bursts away
+                from the portrait, scaling down as it fades. Every element carries
+                <code>--out</code> and <code>--burst</code> coordinates, so the
+                scatter radiates from the center like a released field.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 04</span>
+              <h3>A layer built, then retired</h3>
+              <p>
+                The markup and CSS for a constellation SVG still exist in the
+                source, three lines meant to draw between the signal chips. They
+                ship with <code>display: none</code> on the live site and stay off
+                here too: a leftover from the animation's build process, not a
+                feature. The three chips carried the connective idea on their own,
+                so the drawn links were cut without a redesign.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 06</span>
+              <h3>Why the portrait holds still</h3>
+              <p>
+                The section claims the system runs the loop while the person keeps
+                the judgment. The animation states it literally: tools arrive, link,
+                charge and leave, and the human at the center never moves.
+              </p>
+            </div>
+          </div>
+
+          <dl class="ledger">
+            <div class="ledger-title">specimen ledger</div>
+            <div class="ledger-row">
+              <dt>Cycle</dt>
+              <dd>--origin-cycle: 9.6s · all instruments share it</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Arrival easing</dt>
+              <dd>cubic-bezier(0.16, 1, 0.3, 1) <em>· quint-out, slight overshoot via scale 1.04</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Signal stagger</dt>
+              <dd>A 12% · C 21% · B 30% <em>· context, handoff, verified output</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Dot boot</dt>
+              <dd>step-end flicker ×4 in #ff4d5f → settle var(--green) + 14px glow</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Constellation SVG</dt>
+              <dd>display: none <em>· present in source, unused, see note 04</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Meter</dt>
+              <dd>scaleX 0→1 over 8–39% · peak glow 50–70% <em>· cyan→green fill</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Ambience</dt>
+              <dd>conic ring blur(16px) spinning 18s linear · tilted hairline ellipse</dd>
+            </div>
+          </dl>
+
+          <nav class="stage-foot" aria-label="Stage footer">
+            <a href="02-atoms.html">← 02 · interface atoms</a>
+            <span class="sf-mid">03 / 06 · the orbit</span>
+            <a href="04-review-queue.html">04 · the review queue →</a>
+          </nav>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-visible");
+                obs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.1 },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el, i) => {
+          el.style.transitionDelay = `${Math.min(i * 40, 240)}ms`;
+          obs.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>

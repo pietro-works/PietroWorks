@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Stage 05 · The module board — pietro.works showcase</title>
+    <meta
+      name="description"
+      content="The Reliability animation from pietro.works, isolated: a synthetic cursor assembles six modules into a wired system, tears it down, and starts again."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://api.fontshare.com" rel="preconnect" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared.css" />
+    <style>
+      /* ================================================================
+         The exhibit: the Reliability module board, verbatim production
+         CSS. The choreography script below is the production logic,
+         un-minified, with a replay control added for the stage.
+         ================================================================ */
+      .module-board {
+        border: 1px solid var(--line);
+        border-radius: var(--rx-xl);
+        background: rgba(6, 10, 18, 0.8);
+        grid-template-columns: 246px minmax(0, 1fr);
+        gap: 0;
+        width: min(1040px, 100%);
+        min-height: 320px;
+        margin-left: auto;
+        margin-right: auto;
+        display: grid;
+        position: relative;
+        overflow: hidden;
+      }
+      .module-shelf {
+        border-right: 1px solid var(--line);
+        padding: var(--space-card-standard-x);
+        background: rgba(10, 15, 30, 0.5);
+        flex-direction: column;
+        gap: 8px;
+        display: flex;
+      }
+      .module-file {
+        --module-rgb: 57, 232, 255;
+        border: 1px solid var(--line);
+        border-radius: var(--rx-sm);
+        color: var(--muted);
+        cursor: grab;
+        transition:
+          border-color 0.18s,
+          color 0.18s,
+          transform 0.18s,
+          box-shadow 0.18s,
+          opacity 0.42s var(--ease);
+        user-select: none;
+        background: rgba(6, 10, 18, 0.6);
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        font-family: "DM Mono", "Courier New", monospace;
+        font-size: 12px;
+        line-height: 1.1;
+        display: flex;
+        position: relative;
+      }
+      .module-file:hover {
+        border-color: rgba(var(--module-rgb), 0.34);
+        color: rgb(var(--module-rgb));
+        box-shadow: 0 0 18px rgba(var(--module-rgb), 0.08);
+        transform: translate(3px);
+      }
+      .module-file.placed {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .module-file.placed.is-clicking {
+        opacity: 1;
+      }
+      .module-file.is-clicking {
+        border-color: rgba(var(--module-rgb), 0.48);
+        color: rgb(var(--module-rgb));
+        box-shadow:
+          0 0 0 1px rgba(var(--module-rgb), 0.08),
+          0 0 24px rgba(var(--module-rgb), 0.16);
+        transform: translate(4px) scale(1.01);
+      }
+      .module-file.restoring {
+        animation: shelfFileRestore 0.58s var(--ease) var(--restore-delay, 0s) both;
+      }
+      .mf-icon {
+        color: rgb(var(--module-rgb));
+        text-shadow: 0 0 10px rgba(var(--module-rgb), 0.42);
+        flex-shrink: 0;
+        font-size: 11px;
+      }
+      .mf-name {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+      }
+      .mf-size {
+        color: var(--dim);
+        font-size: 10px;
+      }
+      .module-cursor {
+        --cursor-x: 24px;
+        --cursor-y: 24px;
+        --cursor-speed: 0.46s;
+        --cursor-ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --pointer-hotspot-x: 12px;
+        --pointer-hotspot-y: 1px;
+        z-index: 8;
+        pointer-events: none;
+        opacity: 0;
+        width: 34px;
+        height: 38px;
+        transform: translate3d(
+          calc(var(--cursor-x) - var(--pointer-hotspot-x)),
+          calc(var(--cursor-y) - var(--pointer-hotspot-y)),
+          0
+        );
+        transition:
+          transform var(--cursor-speed) var(--cursor-ease),
+          opacity 0.24s ease,
+          filter 0.24s ease;
+        transform-origin: var(--pointer-hotspot-x) var(--pointer-hotspot-y);
+        filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.42));
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .module-cursor.is-visible {
+        opacity: 1;
+      }
+      .module-cursor-shape {
+        background: linear-gradient(145deg, #fff 0%, #eafcff 36%, #73f1ff 70%, #68ffc5 100%);
+        width: 34px;
+        height: 38px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        scale: 1;
+        box-shadow:
+          inset 5px -8px 14px rgba(57, 232, 255, 0.18),
+          0 0 20px rgba(57, 232, 255, 0.34);
+        -webkit-mask: url(../assets/pointer.svg) 0 0 / contain no-repeat;
+        mask: url(../assets/pointer.svg) 0 0 / contain no-repeat;
+      }
+      .module-cursor:after {
+        content: "";
+        left: calc(var(--pointer-hotspot-x) - 9px);
+        top: calc(var(--pointer-hotspot-y) - 9px);
+        opacity: 0;
+        background: rgba(57, 232, 255, 0.12);
+        border: 1px solid rgba(57, 232, 255, 0.76);
+        border-radius: 999px;
+        width: 18px;
+        height: 18px;
+        position: absolute;
+        transform: scale(0.45);
+      }
+      .module-cursor.is-clicking .module-cursor-shape {
+        animation: 0.38s cubic-bezier(0.16, 1, 0.3, 1) both moduleCursorTap;
+      }
+      .module-cursor.is-clicking:after {
+        animation: 0.44s ease-out both moduleCursorPulse;
+      }
+      @keyframes moduleCursorTap {
+        0%,
+        to {
+          scale: 1;
+        }
+        46% {
+          scale: 0.92;
+        }
+      }
+      @keyframes moduleCursorPulse {
+        0% {
+          opacity: 0;
+          transform: scale(0.45);
+        }
+        34% {
+          opacity: 0.95;
+          transform: scale(1.45);
+        }
+        to {
+          opacity: 0;
+          transform: scale(0.45);
+        }
+      }
+      .module-canvas {
+        padding: var(--space-card-standard-x);
+        min-height: 320px;
+        position: relative;
+        overflow: hidden;
+      }
+      .canvas-grid-bg {
+        background-image:
+          linear-gradient(rgba(57, 232, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(57, 232, 255, 0.04) 1px, transparent 1px);
+        background-size: 32px 32px;
+        position: absolute;
+        inset: 0;
+      }
+      .canvas-placeholder {
+        color: var(--dim);
+        pointer-events: none;
+        justify-content: center;
+        align-items: center;
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+        transition: opacity 0.4s;
+        display: flex;
+        position: absolute;
+        inset: 0;
+      }
+      .canvas-node {
+        --module-rgb: 57, 232, 255;
+        border: 1px solid rgba(var(--module-rgb), 0.38);
+        border-radius: var(--rx-sm);
+        background:
+          radial-gradient(circle at 20% 35%, rgba(var(--module-rgb), 0.13), transparent 62%),
+          rgba(10, 15, 30, 0.95);
+        color: rgb(var(--module-rgb));
+        box-shadow: 0 4px 20px rgba(var(--module-rgb), 0.12);
+        animation: nodeAppear 0.42s var(--ease) forwards;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 2;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        transition:
+          border-color 0.8s,
+          box-shadow 0.8s,
+          filter 0.8s;
+        display: flex;
+        position: absolute;
+        transform: translate(-50%, -50%);
+      }
+      .canvas-node-icon {
+        opacity: 0.8;
+        font-size: 11px;
+      }
+      .canvas-node.cluster-clicked {
+        animation: 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards nodeClusterGlow;
+      }
+      @keyframes nodeAppear {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.82) translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1) translateY(0);
+        }
+      }
+      .canvas-node.is-exiting {
+        animation: nodeExit 0.82s cubic-bezier(0.22, 1, 0.36, 1) var(--exit-delay, 0s) forwards;
+      }
+      .canvas-connector {
+        --connector-rgb: 57, 232, 255;
+        background: linear-gradient(
+          90deg,
+          rgba(var(--connector-rgb), 0.52),
+          rgba(var(--connector-rgb), 0.12)
+        );
+        transform-origin: 0;
+        pointer-events: none;
+        height: 1px;
+        animation: connAppear 0.3s var(--ease) forwards;
+        z-index: 1;
+        position: absolute;
+      }
+      @keyframes nodeClusterGlow {
+        0% {
+          filter: brightness();
+          border-color: rgba(var(--module-rgb), 0.38);
+          box-shadow: 0 4px 20px rgba(var(--module-rgb), 0.12);
+        }
+        to {
+          filter: brightness(1.12);
+          border-color: rgba(var(--module-rgb), 0.58);
+          box-shadow:
+            0 4px 24px rgba(var(--module-rgb), 0.22),
+            0 0 24px rgba(0, 255, 153, 0.18),
+            0 0 44px rgba(0, 255, 153, 0.1);
+        }
+      }
+      @keyframes connAppear {
+        0% {
+          opacity: 0;
+          transform: rotate(var(--rot, 0deg)) scaleX(0);
+        }
+        to {
+          opacity: 1;
+          transform: rotate(var(--rot, 0deg)) scaleX(1);
+        }
+      }
+      .canvas-connector.is-exiting {
+        animation: connExit 0.68s var(--ease) var(--exit-delay, 0s) forwards;
+      }
+      @keyframes nodeExit {
+        0% {
+          opacity: 1;
+          filter: blur();
+          transform: translate(-50%, -50%) scale(1);
+        }
+        46% {
+          opacity: 0.76;
+          filter: blur(0.3px);
+          transform: translate(
+              calc(-50% + var(--exit-x-mid, 0px)),
+              calc(-50% + var(--exit-y-mid, 0px))
+            )
+            scale(0.96);
+        }
+        to {
+          opacity: 0;
+          filter: blur(2px);
+          transform: translate(
+              calc(-50% + var(--exit-x, 0px)),
+              calc(-50% + var(--exit-y, 0px))
+            )
+            scale(0.82);
+        }
+      }
+      @keyframes connExit {
+        0% {
+          opacity: 1;
+          transform: rotate(var(--rot, 0deg)) scaleX(1);
+        }
+        to {
+          opacity: 0;
+          transform: rotate(var(--rot, 0deg)) scaleX(0);
+        }
+      }
+      @keyframes shelfFileRestore {
+        0% {
+          opacity: 0.4;
+          border-color: var(--line);
+          transform: translate(0);
+        }
+        54% {
+          opacity: 0.72;
+          border-color: rgba(57, 232, 255, 0.28);
+          transform: translate(2px);
+        }
+        to {
+          opacity: 1;
+          border-color: var(--line);
+          transform: translate(0);
+        }
+      }
+      @media (max-width: 640px) {
+        .module-board {
+          grid-template-columns: 1fr;
+        }
+        .module-shelf {
+          border-right: none;
+          border-bottom: 1px solid var(--line);
+        }
+        .module-canvas {
+          min-height: 200px;
+        }
+      }
+
+      /* Module color legend (showcase furniture) */
+      .hue-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 22px;
+      }
+      .hue {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 12px 5px 7px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 10.5px;
+        color: var(--muted);
+      }
+      .hue i {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div aria-hidden="true" class="ambient ambient-a"></div>
+    <div aria-hidden="true" class="ambient ambient-b"></div>
+    <div aria-hidden="true" class="scanline"></div>
+
+    <header class="sc-top">
+      <div class="wrap">
+        <a class="sc-brand" href="../index.html">Pietro<sup>.works/showcase</sup></a>
+        <nav class="sc-crumb" aria-label="Stages">
+          <a href="../index.html">index</a>
+          <span class="sc-sep">·</span>
+          <a href="01-accent.html">01</a>
+          <a href="02-atoms.html">02</a>
+          <a href="03-orbit.html">03</a>
+          <a href="04-review-queue.html">04</a>
+          <a href="05-modules.html" aria-current="page">05</a>
+          <a href="06-flip.html">06</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="band band--hero">
+        <div class="wrap">
+          <div class="stage-hero">
+            <div class="eyebrow"><span class="dot"></span> stage_05 · highlight</div>
+            <h1>A ghost operator builds the system</h1>
+            <p class="sub">
+              The Reliability section claims the tools are built from small modules,
+              then proves it by performing the build. A synthetic cursor picks six
+              files off the shelf, places each one as a glowing node, wires them in
+              sequence, taps the finished cluster, and clears the canvas. Then it
+              starts over, because a demo you can watch twice is a demo you trust.
+            </p>
+          </div>
+
+          <figure class="pedestal" style="padding: clamp(18px, 3vw, 36px)" aria-label="The module board animation, isolated and running">
+            <span class="pedestal-tick pedestal-tick--tl">reliability / board</span>
+            <span class="pedestal-tick pedestal-tick--br">loop ~11s · scripted cursor</span>
+            <div class="module-board" id="moduleBoard">
+              <div class="module-shelf" id="moduleShelf">
+                <div class="module-file" data-module="context-ingest">
+                  <span class="mf-icon">⬡</span>
+                  <span class="mf-name">context-ingest.js</span>
+                  <span class="mf-size">2.4 kb</span>
+                </div>
+                <div class="module-file" data-module="metadata-map">
+                  <span class="mf-icon">◈</span>
+                  <span class="mf-name">metadata-map.js</span>
+                  <span class="mf-size">3.1 kb</span>
+                </div>
+                <div class="module-file" data-module="ai-handoff">
+                  <span class="mf-icon">◎</span>
+                  <span class="mf-name">ai-handoff.js</span>
+                  <span class="mf-size">1.8 kb</span>
+                </div>
+                <div class="module-file" data-module="validation-loop">
+                  <span class="mf-icon">◇</span>
+                  <span class="mf-name">validation-loop.js</span>
+                  <span class="mf-size">4.2 kb</span>
+                </div>
+                <div class="module-file" data-module="human-review">
+                  <span class="mf-icon">●</span>
+                  <span class="mf-name">human-review.js</span>
+                  <span class="mf-size">2.9 kb</span>
+                </div>
+                <div class="module-file" data-module="sync-actions">
+                  <span class="mf-icon">○</span>
+                  <span class="mf-name">sync-actions.js</span>
+                  <span class="mf-size">1.6 kb</span>
+                </div>
+              </div>
+              <div class="module-canvas" id="moduleCanvas">
+                <div aria-hidden="true" class="canvas-grid-bg"></div>
+                <div class="canvas-placeholder"><span>core.js is ready to load modules</span></div>
+              </div>
+            </div>
+            <div class="sc-controls">
+              <button class="sc-btn" id="replayBtn" type="button">replay build</button>
+            </div>
+          </figure>
+
+          <div class="hue-legend" aria-label="Module color assignments">
+            <span class="hue"><i style="background: rgb(57, 232, 255)"></i>context-ingest</span>
+            <span class="hue"><i style="background: rgb(88, 166, 255)"></i>metadata-map</span>
+            <span class="hue"><i style="background: rgb(168, 85, 247)"></i>ai-handoff</span>
+            <span class="hue"><i style="background: rgb(0, 255, 153)"></i>validation-loop</span>
+            <span class="hue"><i style="background: rgb(255, 120, 205)"></i>human-review</span>
+            <span class="hue"><i style="background: rgb(251, 191, 36)"></i>sync-actions</span>
+          </div>
+
+          <div class="readout" role="note">
+            <b>6 modules</b><i>·</i><b>cursor travel 760ms quint-out</b><i>·</i>
+            <b>place cadence 650ms</b><i>·</i><b>exit stagger 70ms</b><i>·</i>
+            <b>shelf restore 55ms steps</b>
+          </div>
+
+          <div class="notes">
+            <div class="note" data-reveal>
+              <span class="n-index">note / 01</span>
+              <h3>The cursor moves like a hand</h3>
+              <p>
+                Travel runs on a quint-out curve, the tap dips the pointer to 92%
+                scale, and a ring pulses out from the hotspot. Between placements the
+                cursor drifts 28% of the way toward its next target before committing.
+                Nothing teleports, so the eye never loses the thread.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 02</span>
+              <h3>Each module owns a hue</h3>
+              <p>
+                A per-file <code>--module-rgb</code> variable rides from shelf row to
+                node tint to connector gradient. Four hues come from the brand
+                spectrum; steel blue and amber extend it, because six distinguishable
+                modules matter more here than palette purity.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 03</span>
+              <h3>Placement depletes the shelf</h3>
+              <p>
+                The moment a file lands on the canvas, its shelf row fades to 40% and
+                stops accepting the hover state. The inventory metaphor holds: a
+                module is either on the shelf or in the machine, never both.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 04</span>
+              <h3>The teardown radiates</h3>
+              <p>
+                Exit vectors point away from the canvas center, computed per node at
+                placement time. Nodes blur as they scatter, connectors retract in
+                reverse order, and the shelf relights in a 55ms cascade. The reset
+                reads as breath out, not as a page refresh.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 05</span>
+              <h3>The finished system gets acknowledged</h3>
+              <p>
+                After the last connector lands, the cursor travels to the cluster's
+                measured centroid and taps once. Every node brightens with a green
+                cast. It is a small beat, but it turns six placements into
+                one system before the teardown begins.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 06</span>
+              <h3>Motion respects the visitor</h3>
+              <p>
+                The whole performance sits behind an IntersectionObserver and a
+                <code>prefers-reduced-motion</code> gate. Off screen it does not run.
+                For visitors who opt out of motion, the board simply presents its
+                shelf, which still makes the modularity argument on its own.
+              </p>
+            </div>
+          </div>
+
+          <dl class="ledger">
+            <div class="ledger-title">specimen ledger</div>
+            <div class="ledger-row">
+              <dt>Cursor travel</dt>
+              <dd>760ms cubic-bezier(0.22,1,0.36,1) between targets · 460ms default</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Tap</dt>
+              <dd>scale 1→0.92→1 over 380ms · ring pulse 440ms ease-out</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Node entry</dt>
+              <dd>nodeAppear 420ms · scale 0.82 + 8px rise → rest</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Connector</dt>
+              <dd>1px gradient line · rotate + scaleX 0→1 over 300ms <em>· origin left</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Exit</dt>
+              <dd>820ms · blur 0→2px · vector = (slot − center) × 0.28 <em>· stagger 70ms</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Slots</dt>
+              <dd>fixed grid of 6 positions, 28→68% x · 24→78% y <em>· reads left to right</em></dd>
+            </div>
+          </dl>
+
+          <nav class="stage-foot" aria-label="Stage footer">
+            <a href="04-review-queue.html">← 04 · the review queue</a>
+            <span class="sf-mid">05 / 06 · the module board</span>
+            <a href="06-flip.html">06 · the flip →</a>
+          </nav>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      /* The production choreography, un-minified. Timings and easings are
+         byte-identical to script.js on the live site; the only addition is
+         the replay control and a stop() used by it. */
+      (() => {
+        const board = document.getElementById("moduleBoard");
+        const shelf = document.getElementById("moduleShelf");
+        const canvas = document.getElementById("moduleCanvas");
+        const placeholder = canvas ? canvas.querySelector(".canvas-placeholder") : null;
+        if (!board || !shelf || !canvas) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        const MODULES = [
+          { id: "context-ingest", icon: "⬡", label: "context-ingest.js", rgb: "57, 232, 255" },
+          { id: "metadata-map", icon: "◈", label: "metadata-map.js", rgb: "88, 166, 255" },
+          { id: "ai-handoff", icon: "◎", label: "ai-handoff.js", rgb: "168, 85, 247" },
+          { id: "validation-loop", icon: "◇", label: "validation-loop.js", rgb: "0, 255, 153" },
+          { id: "human-review", icon: "●", label: "human-review.js", rgb: "255, 120, 205" },
+          { id: "sync-actions", icon: "○", label: "sync-actions.js", rgb: "251, 191, 36" },
+        ];
+        MODULES.forEach((m) => {
+          const row = shelf.querySelector(`[data-module="${m.id}"]`);
+          if (row) row.style.setProperty("--module-rgb", m.rgb);
+        });
+
+        const SLOTS = [
+          { x: 28, y: 24 },
+          { x: 28, y: 50 },
+          { x: 48, y: 38 },
+          { x: 48, y: 68 },
+          { x: 68, y: 52 },
+          { x: 68, y: 78 },
+        ];
+
+        let placedNodes = [];
+        let resetting = false;
+        let started = false;
+        let timer = null;
+
+        const cursor = document.createElement("div");
+        cursor.className = "module-cursor";
+        cursor.setAttribute("aria-hidden", "true");
+        cursor.innerHTML = '<span class="module-cursor-shape"></span>';
+        board.appendChild(cursor);
+
+        function moveCursor(x, y, speed = "460ms", ease = "cubic-bezier(.16, 1, .3, 1)") {
+          cursor.style.setProperty("--cursor-speed", speed);
+          cursor.style.setProperty("--cursor-ease", ease);
+          cursor.style.setProperty("--cursor-x", `${Math.round(x)}px`);
+          cursor.style.setProperty("--cursor-y", `${Math.round(y)}px`);
+        }
+
+        function fileTarget(file) {
+          const b = board.getBoundingClientRect();
+          const f = file.getBoundingClientRect();
+          return {
+            x: f.right - b.left - Math.min(28, 0.18 * f.width),
+            y: f.top - b.top + f.height / 2,
+          };
+        }
+
+        function clusterCenter() {
+          const nodes = Array.from(canvas.querySelectorAll(".canvas-node"));
+          const b = board.getBoundingClientRect();
+          if (nodes.length === 0) {
+            const c = canvas.getBoundingClientRect();
+            return { x: c.left - b.left + c.width / 2, y: c.top - b.top + c.height / 2 };
+          }
+          const bounds = nodes.reduce(
+            (acc, n) => {
+              const r = n.getBoundingClientRect();
+              return {
+                left: Math.min(acc.left, r.left),
+                top: Math.min(acc.top, r.top),
+                right: Math.max(acc.right, r.right),
+                bottom: Math.max(acc.bottom, r.bottom),
+              };
+            },
+            { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
+          );
+          return {
+            x: (bounds.left + bounds.right) / 2 - b.left,
+            y: (bounds.top + bounds.bottom) / 2 - b.top,
+          };
+        }
+
+        function driftToward(from, to, f = 0.28) {
+          const p = { x: from.x + (to.x - from.x) * f, y: from.y + (to.y - from.y) * f };
+          moveCursor(p.x, p.y, "760ms", "cubic-bezier(.22, 1, .36, 1)");
+        }
+
+        function clickPulse() {
+          cursor.classList.remove("is-clicking");
+          void cursor.offsetWidth;
+          cursor.classList.add("is-clicking");
+          setTimeout(() => cursor.classList.remove("is-clicking"), 440);
+        }
+
+        function clearBoard() {
+          canvas.querySelectorAll(".canvas-node, .canvas-connector").forEach((n) => n.remove());
+          shelf.querySelectorAll(".module-file").forEach((f) => {
+            f.classList.remove("placed", "restoring", "is-clicking");
+            f.style.removeProperty("--restore-delay");
+          });
+          cursor.classList.remove("is-visible", "is-clicking");
+          placedNodes = [];
+          if (placeholder) placeholder.style.opacity = "1";
+        }
+
+        function teardown() {
+          const nodes = Array.from(canvas.querySelectorAll(".canvas-node"));
+          const conns = Array.from(canvas.querySelectorAll(".canvas-connector"));
+          const placed = Array.from(shelf.querySelectorAll(".module-file.placed"));
+          conns.forEach((c, i) => {
+            c.style.setProperty("--exit-delay", `${55 * (conns.length - 1 - i)}ms`);
+            c.classList.add("is-exiting");
+          });
+          nodes.forEach((n, i) => {
+            n.style.setProperty("--exit-delay", `${70 * i}ms`);
+            n.classList.add("is-exiting");
+          });
+          placed.forEach((f, i) => {
+            f.style.setProperty("--restore-delay", `${300 + 55 * i}ms`);
+            f.classList.add("restoring");
+            setTimeout(() => {
+              f.classList.remove("placed", "restoring", "is-clicking");
+              f.style.removeProperty("--restore-delay");
+            }, 360 + 55 * i);
+          });
+          if (placeholder) placeholder.style.opacity = "0";
+          timer = setTimeout(() => {
+            clearBoard();
+            timer = setTimeout(runLoop, 700);
+          }, 1250);
+        }
+
+        function connect(a, b) {
+          const c = canvas.getBoundingClientRect();
+          const x1 = c.width * (a.pos.x / 100);
+          const y1 = c.height * (a.pos.y / 100);
+          const dx = c.width * (b.pos.x / 100) - x1;
+          const dy = c.height * (b.pos.y / 100) - y1;
+          const len = Math.max(1, Math.hypot(dx, dy));
+          const rot = (180 * Math.atan2(dy, dx)) / Math.PI;
+          const line = document.createElement("div");
+          line.className = "canvas-connector";
+          line.style.left = `${x1}px`;
+          line.style.top = `${y1}px`;
+          line.style.width = `${len}px`;
+          line.style.setProperty("--rot", `${rot}deg`);
+          line.style.setProperty("--connector-rgb", b.rgb || "57, 232, 255");
+          canvas.appendChild(line);
+        }
+
+        function placeStep(i) {
+          if (i >= MODULES.length) {
+            const center = clusterCenter();
+            driftToward(
+              {
+                x: Number.parseFloat(cursor.style.getPropertyValue("--cursor-x")) || 24,
+                y: Number.parseFloat(cursor.style.getPropertyValue("--cursor-y")) || 24,
+              },
+              center,
+              0.48,
+            );
+            timer = setTimeout(() => {
+              moveCursor(center.x, center.y, "680ms", "cubic-bezier(.16, 1, .3, 1)");
+              timer = setTimeout(() => {
+                clickPulse();
+                canvas
+                  .querySelectorAll(".canvas-node")
+                  .forEach((n) => n.classList.add("cluster-clicked"));
+                timer = setTimeout(teardown, 520);
+              }, 720);
+            }, 1500);
+            return;
+          }
+
+          const mod = MODULES[i];
+          const slot = SLOTS[i] || { x: 34 + (i % 3) * 16, y: 24 + 22 * Math.floor(i / 3) };
+          const file = shelf.querySelector(`[data-module="${mod.id}"]`);
+          let target = null;
+          if (file) {
+            target = fileTarget(file);
+            if (cursor.classList.contains("is-visible")) {
+              moveCursor(target.x, target.y);
+            } else {
+              moveCursor(target.x, target.y, "360ms");
+              cursor.classList.add("is-visible");
+            }
+          }
+
+          timer = setTimeout(
+            () => {
+              if (file) {
+                clickPulse();
+                file.classList.add("is-clicking");
+                setTimeout(() => file.classList.add("placed"), 160);
+                setTimeout(() => file.classList.remove("is-clicking"), 560);
+              }
+              if (placeholder && i === 0) placeholder.style.opacity = "0";
+
+              const node = document.createElement("div");
+              node.className = "canvas-node";
+              node.style.left = `${slot.x}%`;
+              node.style.top = `${slot.y}%`;
+              const c = canvas.getBoundingClientRect();
+              const ex = ((slot.x - 50) / 100) * c.width * 0.28;
+              const ey = ((slot.y - 50) / 100) * c.height * 0.28;
+              node.style.setProperty("--exit-x", `${ex}px`);
+              node.style.setProperty("--exit-y", `${ey}px`);
+              node.style.setProperty("--exit-x-mid", `${0.45 * ex}px`);
+              node.style.setProperty("--exit-y-mid", `${0.45 * ey}px`);
+              node.style.setProperty("--module-rgb", mod.rgb);
+              node.innerHTML = `<span class="canvas-node-icon">${mod.icon}</span>${mod.label}`;
+              canvas.appendChild(node);
+              placedNodes.push({ node, pos: slot, rgb: mod.rgb });
+              if (placedNodes.length >= 2) {
+                connect(placedNodes[placedNodes.length - 2], placedNodes[placedNodes.length - 1]);
+              }
+
+              const next = MODULES[i + 1];
+              const nextFile = next ? shelf.querySelector(`[data-module="${next.id}"]`) : null;
+              const nextTarget = nextFile ? fileTarget(nextFile) : clusterCenter();
+              if (target && nextTarget) setTimeout(() => driftToward(target, nextTarget), 220);
+              timer = setTimeout(() => placeStep(i + 1), 650);
+            },
+            i === 0 ? 220 : 420,
+          );
+        }
+
+        function runLoop() {
+          if (resetting) return;
+          resetting = true;
+          clearBoard();
+          setTimeout(() => {
+            resetting = false;
+            placeStep(0);
+          }, 400);
+        }
+
+        function stop() {
+          if (timer) {
+            clearTimeout(timer);
+            timer = null;
+          }
+        }
+
+        new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting && !started) {
+                started = true;
+                setTimeout(runLoop, 600);
+              }
+            });
+          },
+          { threshold: 0.25 },
+        ).observe(board);
+
+        document.getElementById("replayBtn").addEventListener("click", () => {
+          stop();
+          resetting = false;
+          runLoop();
+        });
+      })();
+
+      (() => {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-visible");
+                obs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.1 },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el, i) => {
+          el.style.transitionDelay = `${Math.min(i * 40, 240)}ms`;
+          obs.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>

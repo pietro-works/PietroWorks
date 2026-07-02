@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Stage 04 · The review queue — pietro.works showcase</title>
+    <meta
+      name="description"
+      content="The Architecture split-screen from pietro.works, isolated: manual chaos on the left, an automated pipeline on the right, replaying the same 7.5 second story."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://api.fontshare.com" rel="preconnect" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared.css" />
+    <style>
+      /* ================================================================
+         The exhibit: the Architecture section's review-queue split view,
+         verbatim production CSS. Two lanes race the same task: manual
+         chaos on the left, the automated pipeline on the right.
+         ================================================================ */
+      .redacted-dash {
+        border-radius: var(--rx-md);
+        background:
+          radial-gradient(circle at 85% 18%, rgba(0, 255, 153, 0.08), transparent 30%),
+          rgba(6, 10, 18, 0.5);
+        border: 1px solid rgba(57, 232, 255, 0.12);
+        overflow: hidden;
+      }
+      .redacted-dash-header {
+        border-bottom: 1px solid var(--line);
+        background: rgba(6, 10, 18, 0.5);
+        align-items: center;
+        gap: 12px;
+        padding: 11px 16px;
+        display: flex;
+      }
+      .redact-label {
+        letter-spacing: 0.1em;
+        color: var(--purple);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 999px;
+        padding: 2px 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .redact-tag {
+        color: var(--dim);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+      }
+      .redact-row {
+        border-radius: var(--rx-sm);
+        background: rgba(57, 232, 255, 0.024);
+        border: 1px solid rgba(57, 232, 255, 0.08);
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        transition:
+          border-color 0.25s,
+          box-shadow 0.25s,
+          background 0.25s;
+        display: flex;
+        position: relative;
+      }
+      .redact-row:before {
+        content: "";
+        background: linear-gradient(
+          105deg,
+          transparent 0,
+          transparent 38%,
+          rgba(57, 232, 255, 0.09),
+          transparent 62%,
+          transparent 100%
+        );
+        animation: 3.6s ease-in-out infinite redactSweep;
+        position: absolute;
+        inset: 0;
+        transform: translate(-120%);
+      }
+      .redact-copy {
+        z-index: 1;
+        flex: 1;
+        min-width: 0;
+        position: relative;
+      }
+      .redact-copy strong {
+        color: var(--ink);
+        font-size: 12px;
+        line-height: 1.15;
+        display: block;
+      }
+      .redact-copy span {
+        color: var(--dim);
+        margin-top: 4px;
+        font-size: 10.5px;
+        display: block;
+      }
+      .redact-progress {
+        background: rgba(57, 232, 255, 0.07);
+        border-radius: 999px;
+        height: 4px;
+        margin-top: 7px;
+        overflow: hidden;
+      }
+      .redact-progress i {
+        width: var(--w, 50%);
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), rgba(0, 255, 153, 0.7));
+        transform-origin: 0;
+        height: 100%;
+        animation: redactProgress 2.8s var(--ease) infinite alternate;
+        display: block;
+      }
+      .rq-progress-red i {
+        background: linear-gradient(90deg, #ff4d6a, #ff9f43) !important;
+      }
+      .redact-badge {
+        border: 1px solid var(--line);
+        color: var(--dim);
+        white-space: nowrap;
+        z-index: 1;
+        border-radius: 999px;
+        flex-shrink: 0;
+        padding: 3px 10px;
+        font-size: 11px;
+        position: relative;
+      }
+      .redact-badge--green {
+        color: var(--green);
+        border-color: rgba(0, 255, 153, 0.25);
+      }
+      .redact-badge--cyan {
+        color: var(--cyan);
+        border-color: rgba(57, 232, 255, 0.25);
+      }
+      .redact-badge--purple {
+        color: var(--purple);
+        border-color: rgba(168, 85, 247, 0.28);
+      }
+      .rq-badge-error {
+        color: #ff4d6a !important;
+        border-color: rgba(255, 77, 106, 0.35) !important;
+        background: rgba(255, 77, 106, 0.08) !important;
+      }
+      @keyframes redactSweep {
+        0%,
+        35% {
+          opacity: 0;
+          transform: translate(-120%);
+        }
+        55% {
+          opacity: 1;
+        }
+        75%,
+        to {
+          opacity: 0;
+          transform: translate(120%);
+        }
+      }
+      @keyframes redactProgress {
+        0% {
+          transform: scaleX(0.72);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      .rq-timer-wrap {
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+        display: flex;
+      }
+      .rq-timer-track {
+        background: rgba(57, 232, 255, 0.1);
+        border-radius: 999px;
+        width: 72px;
+        height: 2px;
+        overflow: hidden;
+      }
+      .rq-timer-fill {
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), var(--green));
+        width: 0%;
+        height: 100%;
+        transition: width 50ms linear;
+      }
+      .rq-split-body {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        min-height: 280px;
+        display: grid;
+        position: relative;
+      }
+      .rq-cursor {
+        z-index: 30;
+        pointer-events: none;
+        opacity: 0;
+        transform-origin: 4px 2px;
+        filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.42))
+          drop-shadow(0 0 12px rgba(57, 232, 255, 0.18));
+        width: 28px;
+        height: 40px;
+        margin-top: -2px;
+        margin-left: -4px;
+        transition: opacity 0.2s;
+        position: absolute;
+      }
+      .rq-panel {
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+        padding: 16px 18px;
+        display: flex;
+        position: relative;
+      }
+      .rq-panel--chaos {
+        background: radial-gradient(at 20% 0, rgba(255, 77, 106, 0.04), transparent 55%);
+      }
+      .rq-panel--flow {
+        background: radial-gradient(at 80% 0, rgba(0, 255, 153, 0.04), transparent 55%);
+      }
+      .rq-panel-head {
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 4px;
+        display: flex;
+      }
+      .rq-panel-label {
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        flex-shrink: 0;
+        padding: 2px 9px;
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        font-weight: 500;
+      }
+      .rq-panel-label--chaos {
+        color: rgba(255, 77, 106, 0.8);
+        background: rgba(255, 77, 106, 0.06);
+        border: 1px solid rgba(255, 77, 106, 0.22);
+      }
+      .rq-panel-label--flow {
+        color: rgba(0, 255, 153, 0.85);
+        background: rgba(0, 255, 153, 0.05);
+        border: 1px solid rgba(0, 255, 153, 0.22);
+      }
+      .rq-panel-title {
+        min-width: 0;
+        color: var(--dim);
+        letter-spacing: 0.02em;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+      }
+      .rq-panel-rows {
+        flex-direction: column;
+        flex: 1;
+        gap: 8px;
+        min-width: 0;
+        display: flex;
+      }
+      .rq-row .redact-copy strong {
+        font-size: 12px;
+      }
+      .rq-row .redact-copy span {
+        font-size: 10.5px;
+      }
+      .rq-row .redact-progress {
+        margin-top: 7px;
+      }
+      .rq-panel--flow #fr3 {
+        height: 74px;
+        min-height: 74px;
+      }
+      .rq-panel--flow #fr3 .redact-copy {
+        flex-direction: column;
+        justify-content: center;
+        min-height: 48px;
+        display: flex;
+      }
+      .rq-row-icon {
+        letter-spacing: 0.02em;
+        border-radius: 7px;
+        flex-shrink: 0;
+        justify-content: center;
+        align-items: center;
+        width: 28px;
+        height: 28px;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        display: flex;
+      }
+      .rq-row-icon--muted {
+        color: var(--muted);
+        background: rgba(61, 78, 110, 0.25);
+      }
+      .rq-row-icon--warn {
+        color: #ff9f43;
+        background: rgba(255, 159, 67, 0.1);
+      }
+      .rq-row-icon--dim {
+        color: var(--dim);
+        background: rgba(61, 78, 110, 0.15);
+      }
+      .rq-row-icon--red {
+        color: #ff4d6a;
+        background: rgba(255, 77, 106, 0.1);
+      }
+      .rq-row-icon--cyan {
+        color: var(--cyan);
+        background: rgba(57, 232, 255, 0.1);
+      }
+      .rq-row-icon--purple {
+        color: var(--purple);
+        background: rgba(168, 85, 247, 0.12);
+      }
+      .rq-row-icon--green {
+        color: var(--green);
+        background: rgba(0, 255, 153, 0.1);
+      }
+      .rq-row-flash {
+        z-index: 2;
+        border-radius: var(--rx-sm);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s;
+        position: absolute;
+        inset: 0;
+      }
+      .rq-row-flash--red {
+        background: rgba(255, 77, 106, 0.1);
+        border: 1px solid rgba(255, 77, 106, 0.45);
+      }
+      .rq-row-flash--green {
+        background: rgba(0, 255, 153, 0.07);
+        border: 1px solid rgba(0, 255, 153, 0.35);
+      }
+      .rq-type-field {
+        background: rgba(6, 10, 18, 0.7);
+        border: 1px solid rgba(57, 232, 255, 0.1);
+        border-radius: 5px;
+        align-items: center;
+        gap: 1px;
+        min-height: 22px;
+        margin-top: 6px;
+        padding: 4px 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 10.5px;
+        display: flex;
+      }
+      .rq-type-field.field-error {
+        border-color: rgba(255, 77, 106, 0.55);
+        box-shadow: 0 0 0 2px rgba(255, 77, 106, 0.1);
+      }
+      .rq-type-key {
+        color: var(--cyan);
+      }
+      .rq-type-sep {
+        color: var(--dim);
+        margin: 0 2px;
+      }
+      .rq-type-caret {
+        background: var(--cyan);
+        opacity: 0;
+        width: 1.5px;
+        height: 11px;
+        margin-left: 1px;
+        animation: 0.85s step-end infinite rqBlink;
+        display: inline-block;
+      }
+      @keyframes rqBlink {
+        0%,
+        to {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+      .rq-thinking {
+        visibility: hidden;
+        align-items: center;
+        gap: 4px;
+        height: 4px;
+        margin-top: 6px;
+        display: flex;
+      }
+      .rq-thinking.visible {
+        visibility: visible;
+      }
+      .rq-thinking span {
+        background: var(--purple);
+        opacity: 0;
+        border-radius: 50%;
+        width: 4px;
+        height: 4px;
+        animation: 1.1s ease-in-out infinite rqDot;
+      }
+      .rq-thinking span:nth-child(2) {
+        animation-delay: 0.18s;
+      }
+      .rq-thinking span:nth-child(3) {
+        animation-delay: 0.36s;
+      }
+      @keyframes rqDot {
+        0%,
+        80%,
+        to {
+          opacity: 0;
+          transform: scale(0.7);
+        }
+        40% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .rq-divider {
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        width: 1px;
+        padding: 16px 0;
+        display: flex;
+        position: relative;
+      }
+      .rq-divider-line {
+        background: linear-gradient(
+          transparent,
+          rgba(57, 232, 255, 0.18) 30%,
+          rgba(57, 232, 255, 0.18) 70%,
+          transparent
+        );
+        flex: 1;
+        width: 1px;
+      }
+      .rq-divider-vs {
+        color: var(--dim);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        writing-mode: vertical-rl;
+        padding: 6px 0;
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        transform: rotate(180deg);
+      }
+      .rq-approve-stamp {
+        z-index: 20;
+        border: 1.5px solid var(--green);
+        border-radius: var(--rx-md);
+        color: var(--green);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        pointer-events: none;
+        white-space: nowrap;
+        opacity: 0;
+        background: rgba(0, 255, 153, 0.08);
+        padding: 9px 22px;
+        font-family: "Clash Display", "DM Sans", sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        transition:
+          transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.3s;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0) rotate(-6deg);
+        box-shadow: 0 0 32px rgba(0, 255, 153, 0.15);
+      }
+      .rq-approve-stamp.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(-4deg);
+      }
+      .rq-row.rq-lit {
+        background: rgba(57, 232, 255, 0.04) !important;
+        border-color: rgba(57, 232, 255, 0.22) !important;
+      }
+      .rq-row.rq-done-green {
+        background: rgba(0, 255, 153, 0.03) !important;
+        border-color: rgba(0, 255, 153, 0.2) !important;
+      }
+      .rq-row.rq-done-purple {
+        background: rgba(168, 85, 247, 0.03) !important;
+        border-color: rgba(168, 85, 247, 0.2) !important;
+      }
+      .rq-row.rq-error {
+        background: rgba(255, 77, 106, 0.05) !important;
+        border-color: rgba(255, 77, 106, 0.35) !important;
+      }
+      @keyframes rqGlitch {
+        0%,
+        to {
+          filter: none;
+          transform: none;
+        }
+        30% {
+          filter: hue-rotate(15deg);
+          transform: translate(-2px);
+        }
+        60% {
+          filter: hue-rotate(-10deg);
+          transform: translate(2px);
+        }
+        90% {
+          transform: none;
+        }
+      }
+      .rq-glitch {
+        animation: 0.35s both rqGlitch;
+      }
+      @media (max-width: 640px) {
+        .rq-split-body {
+          grid-template-rows: auto auto auto;
+          grid-template-columns: 1fr;
+        }
+        .rq-divider {
+          flex-direction: row;
+          width: 100%;
+          padding: 0 16px;
+        }
+        .rq-divider-line {
+          height: 1px;
+          width: auto;
+        }
+        .rq-divider-vs {
+          writing-mode: horizontal-tb;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div aria-hidden="true" class="ambient ambient-a"></div>
+    <div aria-hidden="true" class="ambient ambient-b"></div>
+    <div aria-hidden="true" class="scanline"></div>
+
+    <header class="sc-top">
+      <div class="wrap">
+        <a class="sc-brand" href="../index.html">Pietro<sup>.works/showcase</sup></a>
+        <nav class="sc-crumb" aria-label="Stages">
+          <a href="../index.html">index</a>
+          <span class="sc-sep">·</span>
+          <a href="01-accent.html">01</a>
+          <a href="02-atoms.html">02</a>
+          <a href="03-orbit.html">03</a>
+          <a href="04-review-queue.html" aria-current="page">04</a>
+          <a href="05-modules.html">05</a>
+          <a href="06-flip.html">06</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="band band--hero">
+        <div class="wrap">
+          <div class="stage-hero">
+            <div class="eyebrow"><span class="dot"></span> stage_04 · highlight</div>
+            <h1>Two lanes race the same task</h1>
+            <p class="sub">
+              The Architecture section backs its NDA banner with proof instead of a
+              promise: the same review task run twice, side by side. On the left, a
+              person opens a file, copies a value, mistypes it, and the row goes red.
+              On the right, four pipeline stages ingest, map, verify and sync, and an
+              approval stamp lands. Both lanes replay every 7.5 seconds, driven by
+              one shared clock and a single synthetic cursor.
+            </p>
+          </div>
+
+          <figure class="pedestal" style="padding: clamp(18px, 3vw, 36px)" aria-label="The review queue split animation, isolated and running">
+            <span class="pedestal-tick pedestal-tick--tl">architecture / review-queue</span>
+            <span class="pedestal-tick pedestal-tick--br">loop 7.5s · manual vs automated</span>
+
+            <div class="redacted-dash" data-reveal id="rqAnimDash">
+              <div class="redacted-dash-header">
+                <span class="redact-label">[TASK]</span>
+                <span class="redact-tag">Review Queue Snapshot</span>
+                <div aria-hidden="true" class="rq-timer-wrap">
+                  <div class="rq-timer-track">
+                    <div class="rq-timer-fill" id="rqTimerFill"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="rq-split-body">
+                <img alt="" aria-hidden="true" class="rq-cursor" id="rqCursor" src="../assets/pointer-block.svg" />
+                <!-- Left: the manual panel. -->
+                <div class="rq-panel rq-panel--chaos">
+                  <div class="rq-panel-head">
+                    <span class="rq-panel-label rq-panel-label--chaos">Manual</span>
+                    <span class="rq-panel-title">Open. Copy. Paste. Retry.</span>
+                  </div>
+                  <div class="rq-panel-rows">
+                    <div class="redact-row rq-row" id="cr1">
+                      <div class="rq-row-flash rq-row-flash--red" id="cf1"></div>
+                      <div class="rq-row-icon rq-row-icon--muted">PSD</div>
+                      <div class="redact-copy">
+                        <strong>Source File</strong>
+                        <span id="cs1lbl">font metadata · v3_FINAL</span>
+                        <div class="redact-progress"><i id="cp1" style="--w: 0%"></i></div>
+                      </div>
+                      <div class="redact-badge" id="cb1">—</div>
+                    </div>
+                    <div class="redact-row rq-row" id="cr2">
+                      <div class="rq-row-flash rq-row-flash--red" id="cf2"></div>
+                      <div class="rq-row-icon rq-row-icon--warn">XLS</div>
+                      <div class="redact-copy">
+                        <strong>Review Log</strong>
+                        <span id="cs2lbl">metadata export · 247 rows</span>
+                        <div class="redact-progress"><i id="cp2" style="--w: 0%"></i></div>
+                      </div>
+                      <div class="redact-badge" id="cb2">—</div>
+                    </div>
+                    <div class="redact-row rq-row rq-type-row" id="cr3">
+                      <div class="rq-row-flash rq-row-flash--red" id="cf3"></div>
+                      <div class="rq-row-icon rq-row-icon--dim">TTY</div>
+                      <div class="redact-copy">
+                        <strong>Field Entry</strong>
+                        <div class="rq-type-field" id="rqTypeField">
+                          <span class="rq-type-key">font_weight</span><span class="rq-type-sep">:</span><span id="rqTypeVal"></span><span class="rq-type-caret" id="rqTypeCaret"></span>
+                        </div>
+                      </div>
+                      <div class="redact-badge" id="cb3">—</div>
+                    </div>
+                    <div class="redact-row rq-row" id="cr4">
+                      <div class="rq-row-flash rq-row-flash--red" id="cf4"></div>
+                      <div class="rq-row-icon rq-row-icon--red">✕</div>
+                      <div class="redact-copy">
+                        <strong>Decision</strong>
+                        <span id="cs4lbl">awaiting correction</span>
+                        <div class="redact-progress rq-progress-red"><i id="cp4" style="--w: 0%"></i></div>
+                      </div>
+                      <div class="redact-badge" id="cb4">blocked</div>
+                    </div>
+                  </div>
+                </div>
+                <div aria-hidden="true" class="rq-divider">
+                  <div class="rq-divider-line"></div>
+                  <div class="rq-divider-vs">vs</div>
+                  <div class="rq-divider-line"></div>
+                </div>
+                <!-- Right: the automated panel. -->
+                <div class="rq-panel rq-panel--flow">
+                  <div class="rq-panel-head">
+                    <span class="rq-panel-label rq-panel-label--flow">Automated</span>
+                    <span class="rq-panel-title">Ingest. Parse. Verify. Ship.</span>
+                  </div>
+                  <div class="rq-panel-rows">
+                    <div class="redact-row rq-row" id="fr1">
+                      <div class="rq-row-flash rq-row-flash--green" id="ff1"></div>
+                      <div class="rq-row-icon rq-row-icon--cyan" id="fi1">⬡</div>
+                      <div class="redact-copy">
+                        <strong>Context Ingest</strong>
+                        <span id="fs1lbl">source + log + brief</span>
+                        <div class="redact-progress"><i id="fp1" style="--w: 0%"></i></div>
+                      </div>
+                      <div class="redact-badge" id="fb1">—</div>
+                    </div>
+                    <div class="redact-row rq-row" id="fr2">
+                      <div class="rq-row-flash rq-row-flash--green" id="ff2"></div>
+                      <div class="rq-row-icon rq-row-icon--cyan" id="fi2">◈</div>
+                      <div class="redact-copy">
+                        <strong>Metadata Map</strong>
+                        <span id="fs2lbl">required fields · structured</span>
+                        <div class="redact-progress"><i id="fp2" style="--w: 0%"></i></div>
+                      </div>
+                      <div class="redact-badge" id="fb2">—</div>
+                    </div>
+                    <div class="redact-row rq-row" id="fr3">
+                      <div class="rq-row-flash rq-row-flash--green" id="ff3"></div>
+                      <div class="rq-row-icon rq-row-icon--purple" id="fi3">◎</div>
+                      <div class="redact-copy">
+                        <strong>AI Verdict</strong>
+                        <span id="fs3lbl">structured evidence grid</span>
+                        <div class="rq-thinking" id="rqThinking"><span></span><span></span><span></span></div>
+                      </div>
+                      <div class="redact-badge" id="fb3">—</div>
+                    </div>
+                    <div class="redact-row rq-row" id="fr4">
+                      <div class="rq-row-flash rq-row-flash--green" id="ff4"></div>
+                      <div class="rq-row-icon rq-row-icon--green" id="fi4">○</div>
+                      <div class="redact-copy">
+                        <strong>Sync &amp; Approval</strong>
+                        <span id="fs4lbl">correction patched · queued</span>
+                        <div class="redact-progress"><i id="fp4" style="--w: 0%"></i></div>
+                      </div>
+                      <div class="redact-badge" id="fb4">—</div>
+                    </div>
+                  </div>
+                  <div class="rq-approve-stamp" id="rqStamp">✓ approved</div>
+                </div>
+              </div>
+            </div>
+          </figure>
+
+          <div class="readout" role="note">
+            <b>loop 7.5s</b><i>·</i><b>manual fails at 3.2s</b><i>·</i>
+            <b>automated approves at 6.75s</b><i>·</i><b>one shared cursor</b><i>·</i>
+            <b>typewriter 65ms/char ± jitter</b>
+          </div>
+
+          <div class="notes">
+            <div class="note" data-reveal>
+              <span class="n-index">note / 01</span>
+              <h3>The failure is scripted to the keystroke</h3>
+              <p>
+                At 1.9s the manual lane starts typing <code>800</code> into
+                <code>font_weight</code>, deletes it, and retypes <code>9OO</code>,
+                the letter O standing in for a zero. The typo is not incidental. It
+                is why the row goes red at 3.2s: a human transcription error the
+                automated lane structurally cannot make.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 02</span>
+              <h3>One cursor plays both witnesses</h3>
+              <p>
+                The same <code>#rqCursor</code> element visits every row it needs to
+                touch, in order, on a manually authored keyframe table. Between
+                keyframes its position is interpolated with an ease-in-out curve, so
+                it drifts like a hand rather than teleporting between clicks.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 03</span>
+              <h3>Red and green share a grammar</h3>
+              <p>
+                Both lanes use the same row, badge and progress-bar components. Only
+                the state classes differ: <code>rq-lit</code> while active,
+                <code>rq-done-green</code> or <code>rq-done-purple</code> on success,
+                <code>rq-error</code> with a glitch shake on failure. The comparison
+                works because the visual language never changes, only the outcome.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 04</span>
+              <h3>The AI step visibly thinks</h3>
+              <p>
+                Where the manual lane blocks on a red decision row, the automated
+                lane's third stage shows three pulsing dots, a
+                <code>visibility: hidden</code> element flipped visible only while the
+                model drafts. It is the one moment on the site an AI step is shown
+                working rather than instantly resolved.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 05</span>
+              <h3>The stamp lands, then leaves cleanly</h3>
+              <p>
+                The approval stamp scales in at 6.75s, holds, then eases down to a
+                smaller resting rotation before the loop resets it to zero for the
+                next pass. A single <code>&lt;style&gt;</code> element also gets
+                injected once at runtime to color every error badge, a small proof
+                the component was built to be dropped in anywhere.
+              </p>
+            </div>
+          </div>
+
+          <dl class="ledger">
+            <div class="ledger-title">specimen ledger</div>
+            <div class="ledger-row">
+              <dt>Loop</dt>
+              <dd>7.5s modulo clock · timer bar fills 0→100% every pass</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Manual timeline</dt>
+              <dd>load 0.2–1.1s · read 1.2–1.9s · type 1.9–3.2s · error 3.2s · glitch 3.7s</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Automated timeline</dt>
+              <dd>ingest 5.0–5.35s · map 5.35–5.75s · verdict 5.75–6.2s · sync 6.5–6.75s</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Cursor easing</dt>
+              <dd>position: cubic-quart in/out · arrival snap: ease-out scale pulse</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Typewriter</dt>
+              <dd>65ms/char base · ±14ms random jitter per character</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Trigger</dt>
+              <dd>IntersectionObserver threshold 0.05 · resets and restarts on re-entry</dd>
+            </div>
+          </dl>
+
+          <nav class="stage-foot" aria-label="Stage footer">
+            <a href="03-orbit.html">← 03 · the orbit</a>
+            <span class="sf-mid">04 / 06 · the review queue</span>
+            <a href="05-modules.html">05 · the module board →</a>
+          </nav>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      /* The production choreography, un-minified. Timings and easings are
+         byte-identical to script.js on the live site. */
+      (() => {
+        "use strict";
+        const dash = document.getElementById("rqAnimDash");
+        const cursor = document.getElementById("rqCursor");
+        const timerFill = document.getElementById("rqTimerFill");
+        const manRow = [null, "cr1", "cr2", "cr3", "cr4"].map((id) => (id ? document.getElementById(id) : null));
+        const manBadge = [null, "cb1", "cb2", "cb3", "cb4"].map((id) => (id ? document.getElementById(id) : null));
+        const manFlash = [null, "cf1", "cf2", "cf3", "cf4"].map((id) => (id ? document.getElementById(id) : null));
+        const manProgress = [null, "cp1", "cp2", null, "cp4"].map((id) => (id ? document.getElementById(id) : null));
+        const typeField = document.getElementById("rqTypeField");
+        const typeVal = document.getElementById("rqTypeVal");
+        const typeCaret = document.getElementById("rqTypeCaret");
+        const flowRow = [null, "fr1", "fr2", "fr3", "fr4"].map((id) => (id ? document.getElementById(id) : null));
+        const flowBadge = [null, "fb1", "fb2", "fb3", "fb4"].map((id) => (id ? document.getElementById(id) : null));
+        const flowFlash = [null, "ff1", "ff2", "ff3", "ff4"].map((id) => (id ? document.getElementById(id) : null));
+        const flowProgress = [null, "fp1", "fp2", null, "fp4"].map((id) => (id ? document.getElementById(id) : null));
+        const thinking = document.getElementById("rqThinking");
+        const stamp = document.getElementById("rqStamp");
+        if (!dash) return;
+
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+        const easeInOutQuad = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+        const clampProgress = (v, a, b) => Math.max(0, Math.min(1, (v - a) / (b - a)));
+        const lerp = (a, b, f) => a + (b - a) * f;
+
+        function setBadge(el, cls, text) {
+          if (!el) return;
+          el.className = "redact-badge" + (cls ? " " + cls : "");
+          el.textContent = text;
+        }
+        function setWidth(el, pct) {
+          if (el) el.style.setProperty("--w", pct + "%");
+        }
+        function flash(el, duration) {
+          if (!el) return;
+          el.style.opacity = "1";
+          setTimeout(() => {
+            el.style.transition = "opacity .4s";
+            el.style.opacity = "0";
+          }, duration || 280);
+          setTimeout(() => {
+            el.style.transition = "";
+          }, (duration || 280) + 450);
+        }
+        function lightUp(el) {
+          if (!el) return;
+          el.classList.remove("rq-error", "rq-done-green", "rq-done-purple");
+          el.classList.add("rq-lit");
+        }
+        function settleDone(el, color) {
+          if (!el) return;
+          el.classList.remove("rq-lit");
+          el.classList.add(color === "purple" ? "rq-done-purple" : "rq-done-green");
+          flash(flowFlash[0], 350);
+        }
+        function settleError(el) {
+          if (!el) return;
+          el.classList.remove("rq-lit", "rq-done-green");
+          el.classList.add("rq-error");
+        }
+        function glitch(el) {
+          if (!el) return;
+          el.classList.add("rq-glitch");
+          setTimeout(() => el.classList.remove("rq-glitch"), 400);
+        }
+        function clearState(el) {
+          if (!el) return;
+          el.classList.remove("rq-lit", "rq-done-green", "rq-done-purple", "rq-error", "rq-glitch");
+        }
+
+        let cursorX = 0, cursorY = 0, targetX = 0, targetY = 0, tapPulse = 0, manualActive = false;
+
+        function pointAt(rowEl, xFrac, yFrac) {
+          const container = dash.querySelector(".rq-split-body").getBoundingClientRect();
+          const row = rowEl.getBoundingClientRect();
+          return {
+            x: row.left - container.left + row.width * (xFrac !== undefined ? xFrac : 0.5),
+            y: row.top - container.top + row.height * (yFrac !== undefined ? yFrac : 0.5),
+          };
+        }
+
+        // Cursor waypoints: manual row 1 -> row 2 -> type field -> back to row 1 -> flow row 4.
+        const cursorPath = [
+          { ms: 0, fn: () => pointAt(manRow[1], 0.15, 0.5) },
+          { ms: 380, fn: () => pointAt(manRow[1], 0.78, 0.5) },
+          { ms: 700, fn: () => pointAt(manRow[1], 0.78, 0.5) },
+          { ms: 1050, fn: () => pointAt(manRow[2], 0.15, 0.5) },
+          { ms: 1350, fn: () => pointAt(manRow[2], 0.5, 0.5) },
+          { ms: 1700, fn: () => pointAt(manRow[3], 0.15, 0.5) },
+          { ms: 1900, fn: () => pointAt(manRow[3], 0.35, 0.65) },
+          { ms: 2000, fn: () => pointAt(manRow[3], 0.35, 0.72) },
+          { ms: 2050, fn: () => pointAt(manRow[3], 0.35, 0.72) },
+          { ms: 3400, fn: () => pointAt(manRow[3], 0.38, 0.72) },
+          { ms: 3600, fn: () => pointAt(manRow[2], 0.5, 0.5) },
+          { ms: 3900, fn: () => pointAt(manRow[1], 0.3, 0.5) },
+          { ms: 4200, fn: () => pointAt(manRow[4], 0.5, 0.5) },
+          { ms: 4700, fn: () => pointAt(manRow[4], 0.75, 0.5) },
+          { ms: 5000, fn: () => pointAt(manRow[4], 0.75, 0.5) },
+        ];
+
+        function triggerTapPulse() {
+          tapPulse = 1;
+        }
+
+        // Typewriter for the font_weight field.
+        let typeTarget = "", typeShown = "", typing = false, typeTimer = null, typeSpeed = 65;
+        function typeText(text, speedMs) {
+          clearTimeout(typeTimer);
+          typeTarget = text;
+          typeShown = "";
+          typeSpeed = speedMs || 65;
+          typing = true;
+          typeCaret.style.opacity = "1";
+          typeVal.textContent = "";
+          typeStep();
+        }
+        function typeStep() {
+          if (typing && typeShown.length < typeTarget.length) {
+            typeShown = typeTarget.slice(0, typeShown.length + 1);
+            typeVal.textContent = typeShown;
+            const jitter = 28 * (Math.random() - 0.5);
+            typeTimer = setTimeout(typeStep, typeSpeed + jitter);
+          }
+        }
+        function stopTyping() {
+          clearTimeout(typeTimer);
+          typing = false;
+        }
+
+        // The full event timeline, in order, id-gated so each fires once per pass.
+        let lastEventId = -1, rafId = null, cycleStart = null;
+        const timeline = [
+          { ms: 0, id: 0, fn() {
+            setBadge(manBadge[1], "", "—"); setBadge(manBadge[2], "", "—");
+            setBadge(manBadge[3], "", "—"); setBadge(manBadge[4], "", "blocked");
+            manualActive = true;
+          } },
+          { ms: 200, id: 1, fn() { lightUp(manRow[1]); triggerTapPulse(); setBadge(manBadge[1], "", "loading"); } },
+          { ms: 650, id: 2, fn() {} },
+          { ms: 1100, id: 3, fn() { setWidth(manProgress[1], 100); setBadge(manBadge[1], "redact-badge--cyan", "loaded"); clearState(manRow[1]); } },
+          { ms: 1200, id: 4, fn() { lightUp(manRow[2]); setBadge(manBadge[2], "", "reading"); triggerTapPulse(); } },
+          { ms: 1600, id: 5, fn() { setWidth(manProgress[2], 60); } },
+          { ms: 1900, id: 6, fn() {
+            setWidth(manProgress[2], 100); setBadge(manBadge[2], "redact-badge--cyan", "loaded");
+            clearState(manRow[2]); lightUp(manRow[3]); setBadge(manBadge[3], "", "typing"); triggerTapPulse();
+            setTimeout(() => typeText("800", 72), 120);
+          } },
+          { ms: 2500, id: 7, fn() { stopTyping(); setTimeout(() => { typeShown = ""; typeVal.textContent = ""; typeText("9OO", 68); }, 180); } },
+          { ms: 3200, id: 8, fn() {
+            stopTyping(); triggerTapPulse();
+            setTimeout(() => {
+              typeField.classList.add("field-error");
+              flash(manFlash[1], 600); flash(manFlash[2], 600); flash(manFlash[3], 700);
+              settleError(manRow[3]);
+              setBadge(manBadge[3], "rq-badge-error", "✕ error");
+              setBadge(manBadge[1], "rq-badge-error", "✕ mismatch");
+            }, 160);
+          } },
+          { ms: 3700, id: 9, fn() {
+            glitch(manRow[1]); glitch(manRow[2]); settleError(manRow[1]); settleError(manRow[2]);
+            setBadge(manBadge[2], "rq-badge-error", "✕ mismatch");
+          } },
+          { ms: 4200, id: 10, fn() { lightUp(manRow[4]); triggerTapPulse(); } },
+          { ms: 4600, id: 11, fn() {
+            settleError(manRow[4]); flash(manFlash[4], 800);
+            setBadge(manBadge[4], "rq-badge-error", "critical"); setWidth(manProgress[4], 22);
+          } },
+          { ms: 5000, id: 12, fn() { manualActive = false; lightUp(flowRow[1]); setBadge(flowBadge[1], "", "ingesting…"); } },
+          { ms: 5150, id: 13, fn() { setWidth(flowProgress[1], 55); } },
+          { ms: 5350, id: 14, fn() {
+            setWidth(flowProgress[1], 100); flash(flowFlash[1], 400); settleDone(flowRow[1], "green");
+            setBadge(flowBadge[1], "redact-badge--cyan", "mapped"); lightUp(flowRow[2]); setBadge(flowBadge[2], "", "parsing…");
+          } },
+          { ms: 5500, id: 15, fn() { setWidth(flowProgress[2], 70); thinking.classList.add("visible"); } },
+          { ms: 5750, id: 16, fn() {
+            setWidth(flowProgress[2], 100); flash(flowFlash[2], 400); settleDone(flowRow[2], "green");
+            setBadge(flowBadge[2], "redact-badge--green", "done");
+            lightUp(flowRow[3]); flowRow[3].classList.add("rq-done-purple"); flowRow[3].classList.remove("rq-lit");
+            setBadge(flowBadge[3], "", "checking…");
+          } },
+          { ms: 6200, id: 17, fn() {
+            flash(flowFlash[3], 400); flowRow[3].classList.add("rq-done-purple");
+            setBadge(flowBadge[3], "redact-badge--purple", "✓ 97%"); lightUp(flowRow[4]); setBadge(flowBadge[4], "", "syncing…");
+          } },
+          { ms: 6450, id: 18, fn() { thinking.classList.remove("visible"); } },
+          { ms: 6500, id: 19, fn() { setWidth(flowProgress[4], 75); } },
+          { ms: 6750, id: 20, fn() {
+            setWidth(flowProgress[4], 100); flash(flowFlash[4], 400); settleDone(flowRow[4], "green");
+            setBadge(flowBadge[4], "redact-badge--green", "done");
+            stamp.classList.add("show");
+            setTimeout(() => {
+              stamp.style.transition = "transform .6s cubic-bezier(.22,1,.36,1), opacity .45s";
+              stamp.classList.remove("show");
+              stamp.style.transform = "translate(-50%,-50%) scale(.88) rotate(-4deg)";
+            }, 900);
+          } },
+          { ms: 7350, id: 98, fn() {
+            stamp.style.transition = "";
+            stamp.style.transform = "translate(-50%,-50%) scale(0) rotate(-6deg)";
+          } },
+        ];
+
+        function resetAll() {
+          lastEventId = -1;
+          manualActive = false;
+          for (let i = 1; i <= 4; i++) {
+            clearState(manRow[i]);
+            if (manFlash[i]) { manFlash[i].style.transition = ""; manFlash[i].style.opacity = "0"; }
+          }
+          setBadge(manBadge[1], "", "—"); setBadge(manBadge[2], "", "—");
+          setBadge(manBadge[3], "", "—"); setBadge(manBadge[4], "", "blocked");
+          setWidth(manProgress[1], 0); setWidth(manProgress[2], 0); setWidth(manProgress[4], 0);
+          stopTyping();
+          typeShown = ""; typeTarget = ""; typeVal.textContent = ""; typeCaret.style.opacity = "0";
+          typeField.classList.remove("field-error");
+          for (let i = 1; i <= 4; i++) {
+            clearState(flowRow[i]);
+            if (flowFlash[i]) { flowFlash[i].style.transition = ""; flowFlash[i].style.opacity = "0"; }
+          }
+          setBadge(flowBadge[1], "", "—"); setBadge(flowBadge[2], "", "—");
+          setBadge(flowBadge[3], "", "—"); setBadge(flowBadge[4], "", "—");
+          setWidth(flowProgress[1], 0); setWidth(flowProgress[2], 0); setWidth(flowProgress[4], 0);
+          thinking.classList.remove("visible");
+          stamp.classList.remove("show");
+          stamp.style.transition = "";
+          stamp.style.transform = "translate(-50%,-50%) scale(0) rotate(-6deg)";
+          stamp.style.opacity = "";
+          cursorX = cursorY = targetX = targetY = 0;
+          cursor.style.opacity = "0";
+        }
+
+        function tick(now) {
+          if (!cycleStart) cycleStart = now;
+          const elapsed = (now - cycleStart) % 7500;
+          const t = elapsed;
+          timerFill.style.width = (elapsed / 7500) * 100 + "%";
+          if (t < 60 && lastEventId >= 0) resetAll();
+
+          for (const ev of timeline) {
+            if (t >= ev.ms && lastEventId < ev.id) {
+              lastEventId = ev.id;
+              ev.fn();
+            }
+          }
+
+          // Progress-bar tweening for the two loading fields.
+          if (t >= 200 && t < 1100) setWidth(manProgress[1], 100 * easeOutCubic(clampProgress(t, 200, 1100)));
+          if (t >= 1200 && t < 1900) setWidth(manProgress[2], 100 * easeOutCubic(clampProgress(t, 1200, 1900)));
+
+          if (manualActive && t < 5000) {
+            cursor.style.opacity = "1";
+            const point = (function (ms) {
+              const path = cursorPath;
+              if (ms <= path[0].ms) return path[0].fn();
+              if (ms >= path[path.length - 1].ms) return path[path.length - 1].fn();
+              for (let i = 0; i < path.length - 1; i++) {
+                if (ms >= path[i].ms && ms <= path[i + 1].ms) {
+                  const f = easeInOutQuad(clampProgress(ms, path[i].ms, path[i + 1].ms));
+                  const a = path[i].fn(), b = path[i + 1].fn();
+                  return { x: lerp(a.x, b.x, f), y: lerp(a.y, b.y, f) };
+                }
+              }
+              return { x: 0, y: 0 };
+            })(t);
+            targetX = point.x;
+            targetY = point.y;
+          } else {
+            cursor.style.opacity = "0";
+          }
+
+          cursorX = lerp(cursorX, targetX, 0.1);
+          cursorY = lerp(cursorY, targetY, 0.1);
+          if (tapPulse > 0) {
+            tapPulse = Math.max(0, tapPulse - 0.04);
+            const scale = 1 - 0.2 * tapPulse;
+            cursor.style.transform = `translate(${cursorX}px,${cursorY}px) scale(${scale})`;
+          } else {
+            cursor.style.transform = `translate(${cursorX}px,${cursorY}px)`;
+          }
+
+          rafId = requestAnimationFrame(tick);
+        }
+
+        new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                dash.classList.add("is-visible");
+                if (!rafId) {
+                  resetAll();
+                  cycleStart = null;
+                  rafId = requestAnimationFrame(tick);
+                }
+              } else if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+              }
+            });
+          },
+          { threshold: 0.05, rootMargin: "0px 0px -40px 0px" },
+        ).observe(dash);
+      })();
+
+      (() => {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-visible");
+                obs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.1 },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el, i) => {
+          el.style.transitionDelay = `${Math.min(i * 40, 240)}ms`;
+          obs.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>

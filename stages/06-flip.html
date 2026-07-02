@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Stage 06 · The flip — pietro.works showcase</title>
+    <meta
+      name="description"
+      content="The Toolkit flip card from pietro.works, isolated: tech tags on the front, the plain-terms translation on the back, one 0.72 second rotation between audiences."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://api.fontshare.com" rel="preconnect" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared.css" />
+    <style>
+      /* ================================================================
+         The exhibit: the Automation card from the Toolkit grid,
+         verbatim production CSS.
+         ================================================================ */
+      .stack-cat {
+        border-radius: var(--rx-lg);
+        width: min(560px, 100%);
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+        perspective: 1200px;
+        transform-style: preserve-3d;
+        outline: none;
+        padding: 0;
+        display: block;
+        margin: 0 auto;
+      }
+      .stack-card-inner {
+        min-height: 224px;
+        transform-style: preserve-3d;
+        transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+        display: grid;
+      }
+      .stack-card-face {
+        padding: var(--space-card-standard-y) var(--space-card-standard-x);
+        border: 1px solid var(--line);
+        border-radius: var(--rx-lg);
+        backface-visibility: hidden;
+        background:
+          radial-gradient(circle at 18% 16%, rgba(57, 232, 255, 0.08), transparent 36%),
+          rgba(10, 15, 30, 0.5);
+        flex-direction: column;
+        grid-area: 1/1;
+        justify-content: center;
+        transition:
+          border-color 0.22s,
+          box-shadow 0.22s,
+          background 0.22s;
+        display: flex;
+      }
+      .stack-card-back {
+        background:
+          radial-gradient(circle at 20% 18%, rgba(0, 255, 153, 0.13), transparent 38%),
+          radial-gradient(circle at 78% 75%, rgba(192, 132, 252, 0.12), transparent 38%),
+          rgba(8, 13, 25, 0.82);
+        justify-content: center;
+        min-height: 100%;
+        transform: rotateY(180deg);
+      }
+      .stack-cat:hover .stack-card-face,
+      .stack-cat:focus-visible .stack-card-face {
+        border-color: rgba(57, 232, 255, 0.24);
+        box-shadow:
+          0 18px 48px rgba(0, 0, 0, 0.22),
+          inset 0 1px rgba(255, 255, 255, 0.04);
+      }
+      .stack-cat:focus-visible .stack-card-face {
+        outline-offset: 4px;
+        outline: 2px solid rgba(57, 232, 255, 0.55);
+      }
+      .stack-cat.is-flipped .stack-card-inner {
+        transform: rotateY(180deg);
+      }
+      .stack-back-kicker {
+        width: max-content;
+        max-width: 100%;
+        color: var(--cyan);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        border: 1px solid rgba(57, 232, 255, 0.24);
+        border-radius: 999px;
+        margin-bottom: 12px;
+        padding: 4px 10px;
+        font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .stack-card-back h3 {
+        max-width: 520px;
+        color: var(--ink);
+        font-size: max(20px, min(2.2vw, 27px));
+        line-height: 1.04;
+      }
+      .stack-card-back p {
+        max-width: 560px;
+        color: var(--muted);
+        margin-top: 14px;
+        font-size: 14px;
+        line-height: 1.55;
+      }
+      .stack-cat-header {
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        display: flex;
+      }
+      .stack-cat-dot {
+        border-radius: 50%;
+        flex-shrink: 0;
+        width: 8px;
+        height: 8px;
+      }
+      .stack-cat-dot--cyan {
+        --stack-dot-color: var(--cyan);
+        --stack-dot-glow: rgba(57, 232, 255, 0.75);
+        background: var(--stack-dot-color);
+        box-shadow: 0 0 8px var(--stack-dot-color);
+      }
+      .stack-cat-label {
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .stack-chips {
+        flex-wrap: wrap;
+        gap: 10px;
+        display: flex;
+      }
+      .stack-chips span {
+        border: 1px solid var(--line);
+        color: var(--muted);
+        cursor: pointer;
+        opacity: 0;
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-size: 14px;
+        transition:
+          color 0.18s,
+          border-color 0.18s,
+          background 0.18s;
+        transform: translateY(12px) scale(0.94);
+      }
+      .stack-cat.chips-active .stack-chips span {
+        animation: 0.56s cubic-bezier(0.16, 1, 0.3, 1) both chipDistribute;
+        animation-delay: var(--chip-delay, 0s);
+      }
+      .stack-chips span:hover {
+        color: var(--ink);
+        background: rgba(57, 232, 255, 0.05);
+        border-color: rgba(57, 232, 255, 0.3);
+      }
+      @keyframes chipDistribute {
+        0% {
+          opacity: 0;
+          filter: blur(3px);
+          transform: translateY(11px) scale(0.92);
+        }
+        70% {
+          opacity: 1;
+          filter: blur();
+        }
+        to {
+          opacity: 1;
+          filter: blur();
+          transform: translateY(0) scale(1);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .stack-chips span {
+          opacity: 1;
+          transform: none;
+        }
+        .stack-card-inner {
+          transition-duration: 0.01s;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    <div aria-hidden="true" class="ambient ambient-a"></div>
+    <div aria-hidden="true" class="ambient ambient-b"></div>
+    <div aria-hidden="true" class="scanline"></div>
+
+    <header class="sc-top">
+      <div class="wrap">
+        <a class="sc-brand" href="../index.html">Pietro<sup>.works/showcase</sup></a>
+        <nav class="sc-crumb" aria-label="Stages">
+          <a href="../index.html">index</a>
+          <span class="sc-sep">·</span>
+          <a href="01-accent.html">01</a>
+          <a href="02-atoms.html">02</a>
+          <a href="03-orbit.html">03</a>
+          <a href="04-review-queue.html">04</a>
+          <a href="05-modules.html">05</a>
+          <a href="06-flip.html" aria-current="page">06</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="band band--hero">
+        <div class="wrap">
+          <div class="stage-hero">
+            <div class="eyebrow"><span class="dot"></span> stage_06 · highlight</div>
+            <h1>Jargon on the front, plain terms on the back</h1>
+            <p class="sub">
+              Every Toolkit card serves two readers at once. The front lists the named
+              tools for the person who evaluates stacks. The back translates the same
+              work into outcomes for the person who signs off. One 0.72 second
+              rotation moves between them. This is the Automation card, the first in
+              the grid. Click it, or press Enter when it has focus.
+            </p>
+          </div>
+
+          <figure class="pedestal pedestal--grid" aria-label="The automation flip card, live">
+            <span class="pedestal-tick pedestal-tick--tl">toolkit / card 01</span>
+            <span class="pedestal-tick pedestal-tick--br">rotateY 180° · 720ms</span>
+            <button aria-pressed="false" class="stack-cat" data-stack-card type="button" id="flipCard">
+              <div class="stack-card-inner">
+                <div class="stack-card-face stack-card-front">
+                  <div class="stack-cat-header">
+                    <span class="stack-cat-dot stack-cat-dot--cyan"></span>
+                    <span class="stack-cat-label">Automation</span>
+                  </div>
+                  <div class="stack-chips">
+                    <span>Zapier</span><span>Make</span><span>Browser automation</span>
+                    <span>Workflow logic</span><span>Form automation</span>
+                    <span>Process mapping</span><span>RAG</span>
+                  </div>
+                </div>
+                <div class="stack-card-face stack-card-back">
+                  <span class="stack-back-kicker">Plain terms</span>
+                  <h3>Less handwork, fewer dropped balls</h3>
+                  <p>
+                    I connect the boring steps so your team stops copying, pasting,
+                    checking, and chasing the same thing every day.
+                  </p>
+                </div>
+              </div>
+            </button>
+            <div class="sc-controls">
+              <button class="sc-btn" id="autoBtn" type="button" aria-pressed="true">
+                auto-demo: on
+              </button>
+            </div>
+          </figure>
+
+          <div class="readout" role="note">
+            <b>perspective 1200px</b><i>·</i><b>flip 720ms quint-out</b><i>·</i>
+            <b>chips cascade 82ms</b><i>·</i><b>it is a real button</b>
+          </div>
+
+          <div class="notes">
+            <div class="note" data-reveal>
+              <span class="n-index">note / 01</span>
+              <h3>Two faces, one grid cell</h3>
+              <p>
+                Both faces declare <code>grid-area: 1/1</code>, so they stack without
+                absolute positioning and the card's height stays honest: it is always
+                as tall as its tallest face. The back starts pre-rotated 180° and
+                <code>backface-visibility: hidden</code> keeps each side invisible
+                from behind.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 02</span>
+              <h3>The turn feels physical</h3>
+              <p>
+                The button element carries <code>perspective: 1200px</code>, deep
+                enough to read as an object turning rather than a texture warping.
+                The 720ms quint-out curve spends its speed early and lands the back
+                face gently, like a card set down rather than snapped.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 03</span>
+              <h3>Chips arrive one at a time</h3>
+              <p>
+                On first reveal the seven tool chips cascade in with an 82ms stagger,
+                each rising 11px out of a slight blur. The order matters: the reader
+                scans Zapier before RAG, tools before concepts.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 04</span>
+              <h3>It is a button, not a div</h3>
+              <p>
+                The card is a real <code>&lt;button&gt;</code> with
+                <code>aria-pressed</code> tracking the flip. Enter and Space flip it,
+                Escape restores the front, and flipping one card in the grid closes
+                the others so only one back is ever open.
+              </p>
+            </div>
+          </div>
+
+          <dl class="ledger">
+            <div class="ledger-title">specimen ledger</div>
+            <div class="ledger-row">
+              <dt>Flip</dt>
+              <dd>rotateY 0→180° · 720ms cubic-bezier(0.16, 1, 0.3, 1)</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Depth</dt>
+              <dd>perspective 1200px on the button · preserve-3d on inner</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Face stack</dt>
+              <dd>grid-area 1/1 ×2 · backface-visibility hidden · back pre-rotated 180°</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Chip cascade</dt>
+              <dd>chipDistribute 560ms · per-chip delay n × 82ms <em>· blur 3px → 0</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Accessibility</dt>
+              <dd>button + aria-pressed · Enter / Space flip · Escape resets</dd>
+            </div>
+          </dl>
+
+          <nav class="stage-foot" aria-label="Stage footer">
+            <a href="05-modules.html">← 05 · the module board</a>
+            <span class="sf-mid">06 / 06 · the flip</span>
+            <a href="../index.html">showcase index →</a>
+          </nav>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const card = document.getElementById("flipCard");
+        const autoBtn = document.getElementById("autoBtn");
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // Chip cascade on first reveal, same delays as production.
+        card.querySelectorAll(".stack-chips span").forEach((chip, i) => {
+          chip.style.setProperty("--chip-delay", `${reduced ? 0 : i * 82}ms`);
+        });
+        setTimeout(() => card.classList.add("chips-active"), reduced ? 0 : 300);
+
+        function setFlipped(state) {
+          card.classList.toggle("is-flipped", state);
+          card.setAttribute("aria-pressed", String(state));
+        }
+
+        // Production interaction grammar.
+        card.addEventListener("click", () => {
+          userTouched();
+          setFlipped(!card.classList.contains("is-flipped"));
+        });
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            setFlipped(false);
+          } else if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            userTouched();
+            setFlipped(!card.classList.contains("is-flipped"));
+          }
+        });
+
+        // Stage-only auto demo: flip every 5.5s until the visitor takes over.
+        let auto = !reduced;
+        let autoTimer = null;
+        let resumeTimer = null;
+        function schedule() {
+          clearInterval(autoTimer);
+          if (!auto) return;
+          autoTimer = setInterval(() => {
+            setFlipped(!card.classList.contains("is-flipped"));
+          }, 5500);
+        }
+        function userTouched() {
+          clearInterval(autoTimer);
+          clearTimeout(resumeTimer);
+          if (auto) resumeTimer = setTimeout(schedule, 14000);
+        }
+        autoBtn.addEventListener("click", () => {
+          auto = !auto;
+          autoBtn.setAttribute("aria-pressed", String(auto));
+          autoBtn.textContent = auto ? "auto-demo: on" : "auto-demo: off";
+          clearTimeout(resumeTimer);
+          schedule();
+        });
+        schedule();
+
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-visible");
+                obs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.1 },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el, i) => {
+          el.style.transitionDelay = `${Math.min(i * 40, 240)}ms`;
+          obs.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>

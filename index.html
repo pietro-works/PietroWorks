@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>The anatomy of pietro.works — design showcase</title>
+    <meta
+      name="description"
+      content="One page, taken apart. Every element of pietro.works isolated on its own stage, every section read closely, and the signature animations rebuilt in the open."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://api.fontshare.com" rel="preconnect" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="shared.css" />
+    <style>
+      /* ---- hero accent: the production two-layer construction ---- */
+      .hub-hero {
+        padding-top: clamp(64px, 9vw, 120px);
+      }
+      .hub-hero h1 {
+        font-size: max(40px, min(6.6vw, 78px));
+        line-height: 1.05;
+      }
+      .hub-hero .sub {
+        color: var(--muted);
+        margin-top: 22px;
+        font-size: max(16px, min(1.9vw, 19px));
+        line-height: 1.65;
+        max-width: 640px;
+      }
+      .acc {
+        z-index: 0;
+        color: transparent;
+        white-space: nowrap;
+        isolation: isolate;
+        font-style: normal;
+        background: linear-gradient(
+          105deg,
+          var(--cyan) 0%,
+          #8cf7ff 24%,
+          var(--green) 52%,
+          var(--purple) 78%,
+          var(--cyan) 100%
+        );
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 14px rgba(57, 232, 255, 0.22))
+          drop-shadow(0 0 24px rgba(0, 255, 153, 0.16));
+        -webkit-background-clip: text;
+        background-clip: text;
+        position: relative;
+      }
+      .acc:after {
+        content: attr(data-text);
+        z-index: -1;
+        pointer-events: none;
+        line-height: inherit;
+        background: linear-gradient(
+          105deg,
+          var(--cyan) 0%,
+          #8cf7ff 24%,
+          var(--green) 52%,
+          var(--purple) 78%,
+          var(--cyan) 100%
+        );
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        opacity: 0.22;
+        filter: blur(10px) saturate(1.12);
+        -webkit-background-clip: text;
+        background-clip: text;
+        position: absolute;
+        inset: 0;
+        transform: translateZ(0) scale(1.01);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .acc:after {
+          animation: 3.4s ease-in-out infinite hubGlowPulse;
+        }
+      }
+      @keyframes hubGlowPulse {
+        0%,
+        to {
+          opacity: 0.18;
+          filter: blur(9px) saturate(1.05);
+        }
+        50% {
+          opacity: 0.68;
+          filter: blur(16px) saturate(1.42);
+        }
+      }
+
+      /* ---- section headers ---- */
+      .hub-label {
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--cyan);
+        border: 1px solid var(--line-s);
+        background: rgba(57, 232, 255, 0.06);
+        border-radius: 999px;
+        margin-bottom: 14px;
+        padding: 4px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-block;
+      }
+      .hub-head {
+        max-width: 640px;
+      }
+      .hub-head p {
+        color: var(--muted);
+        margin-top: 14px;
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      /* ---- voice trio ---- */
+      .voice-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: var(--space-grid);
+        margin-top: clamp(28px, 4vw, 40px);
+      }
+      .voice {
+        border-top: 1px solid var(--line-s);
+        padding-top: 18px;
+      }
+      .voice .v-index {
+        color: var(--cyan);
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        display: block;
+        margin-bottom: 12px;
+      }
+      .voice h3 {
+        font-size: 19px;
+        margin-bottom: 10px;
+      }
+      .voice p {
+        color: var(--muted);
+        font-size: 14.5px;
+        line-height: 1.62;
+      }
+
+      /* ---- fingerprint cards ---- */
+      .fp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-grid);
+        margin-top: clamp(28px, 4vw, 40px);
+      }
+      .fp {
+        border: 1px solid var(--line);
+        border-radius: var(--rx-lg);
+        background: rgba(10, 15, 30, 0.5);
+        padding: 22px;
+        display: grid;
+        grid-template-rows: 96px auto;
+        gap: 16px;
+      }
+      .fp-specimen {
+        display: grid;
+        place-items: center;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 14px;
+      }
+      .fp h3 {
+        font-size: 16.5px;
+        margin-bottom: 7px;
+      }
+      .fp p {
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.58;
+      }
+      .fp p code {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        color: var(--cyan);
+      }
+      .fp-acc {
+        font-family: "Clash Display", sans-serif;
+        font-weight: 600;
+        font-size: 34px;
+        letter-spacing: -0.02em;
+      }
+      .swatch-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .swatch {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--rx-md);
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: end center;
+        padding-bottom: 4px;
+        font-family: "DM Mono", monospace;
+        font-size: 8px;
+        color: var(--dim);
+      }
+      .hairline-demo {
+        width: 100%;
+        display: grid;
+        gap: 14px;
+        padding: 0 8px;
+      }
+      .hairline-demo i {
+        display: block;
+        height: 1px;
+      }
+      .hairline-demo span {
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        color: var(--dim);
+        letter-spacing: 0.08em;
+      }
+      .mono-demo {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+      }
+      .mono-demo b {
+        color: var(--cyan);
+        font-weight: 500;
+      }
+      .mono-demo i {
+        font-style: normal;
+        color: var(--dim);
+        font-size: 10px;
+      }
+      .depth-demo {
+        width: 120px;
+        height: 62px;
+        border-radius: var(--rx-md);
+        border: 1px solid var(--line-s);
+        background: var(--bg3);
+        box-shadow: 0 24px 60px -36px rgba(2, 6, 18, 0.9);
+        display: grid;
+        place-items: center;
+      }
+      .depth-demo i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 9px var(--green);
+      }
+      .ease-demo {
+        display: block;
+        overflow: visible;
+      }
+      .ease-demo path {
+        fill: none;
+        stroke: var(--cyan);
+        stroke-width: 2;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 6px rgba(57, 232, 255, 0.4));
+      }
+      .ease-demo line {
+        stroke: rgba(57, 232, 255, 0.22);
+        stroke-width: 1;
+        stroke-dasharray: 3 4;
+      }
+      .ease-demo circle {
+        fill: var(--green);
+      }
+      .radii-demo {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+      .radii-demo i {
+        display: block;
+        border: 1px solid var(--line-s);
+        background: rgba(57, 232, 255, 0.05);
+      }
+
+      /* ---- anatomy ledger ---- */
+      .anatomy {
+        border-top: 1px solid var(--line);
+        margin-top: clamp(28px, 4vw, 40px);
+      }
+      .an-row {
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: 56px minmax(180px, 0.9fr) minmax(0, 2fr);
+        gap: 20px;
+        padding: 20px 0;
+        align-items: baseline;
+      }
+      .an-row .an-index {
+        color: var(--dim);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+      }
+      .an-row h3 {
+        font-size: 18px;
+      }
+      .an-row .an-tag {
+        display: block;
+        margin-top: 8px;
+        color: var(--cyan);
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .an-row p {
+        color: var(--muted);
+        font-size: 14.5px;
+        line-height: 1.62;
+      }
+      @media (max-width: 700px) {
+        .an-row {
+          grid-template-columns: 40px minmax(0, 1fr);
+        }
+        .an-row p {
+          grid-column: 2;
+        }
+      }
+
+      /* ---- stage cards ---- */
+      .stage-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: var(--space-grid);
+        margin-top: clamp(28px, 4vw, 40px);
+      }
+      .stage-card {
+        border: 1px solid var(--line);
+        border-radius: var(--rx-lg);
+        background: rgba(10, 15, 30, 0.5);
+        padding: 22px;
+        display: grid;
+        grid-template-rows: 120px auto 1fr auto;
+        gap: 14px;
+        transition:
+          transform 0.3s var(--ease),
+          border-color 0.3s var(--ease),
+          box-shadow 0.3s var(--ease);
+      }
+      .stage-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(57, 232, 255, 0.3);
+        box-shadow: 0 24px 60px -36px rgba(2, 6, 18, 0.9);
+      }
+      .stage-card .sg-preview {
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        padding-bottom: 16px;
+        overflow: hidden;
+      }
+      .stage-card .sg-index {
+        color: var(--cyan);
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+      }
+      .stage-card h3 {
+        font-size: 19px;
+      }
+      .stage-card p {
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.58;
+      }
+      .stage-card .sg-go {
+        color: var(--muted);
+        font-family: "DM Mono", monospace;
+        font-size: 11.5px;
+        letter-spacing: 0.06em;
+        transition: color 0.2s var(--ease);
+      }
+      .stage-card:hover .sg-go {
+        color: var(--cyan);
+      }
+
+      /* stage minis */
+      .mini-acc {
+        font-family: "Clash Display", sans-serif;
+        font-weight: 600;
+        font-size: 30px;
+        letter-spacing: -0.02em;
+      }
+      .mini-eyebrow {
+        color: var(--muted);
+        border: 1px solid var(--line);
+        background: rgba(57, 232, 255, 0.04);
+        border-radius: 999px;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-flex;
+      }
+      .mini-eyebrow i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 8px var(--green);
+      }
+      .mini-orbit {
+        width: 86px;
+        height: 86px;
+        border: 1px solid rgba(57, 232, 255, 0.25);
+        border-radius: 50%;
+        position: relative;
+        transform: rotate(-14deg) scaleX(1.08);
+        box-shadow:
+          0 0 28px rgba(57, 232, 255, 0.12),
+          inset 0 0 20px rgba(0, 255, 153, 0.05);
+      }
+      .mini-orbit b {
+        position: absolute;
+        inset: 24px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #22364f, #0e1525);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+      }
+      .mini-orbit i {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .mini-orbit i:nth-child(2) {
+        top: -4px;
+        left: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 8px var(--cyan);
+      }
+      .mini-orbit i:nth-child(3) {
+        bottom: 6px;
+        left: -2px;
+        background: var(--green);
+        box-shadow: 0 0 8px var(--green);
+      }
+      .mini-orbit i:nth-child(4) {
+        bottom: 6px;
+        right: -2px;
+        background: var(--purple);
+        box-shadow: 0 0 8px var(--purple);
+      }
+      .mini-shelf {
+        display: grid;
+        gap: 6px;
+        width: 150px;
+      }
+      .mini-shelf i {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        border-radius: var(--rx-sm);
+        background: rgba(6, 10, 18, 0.6);
+        padding: 5px 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 8.5px;
+        font-style: normal;
+        color: var(--muted);
+      }
+      .mini-shelf i b {
+        color: var(--cyan);
+        font-weight: 400;
+      }
+      .mini-shelf i:nth-child(2) b {
+        color: var(--purple);
+      }
+      .mini-shelf i:nth-child(3) b {
+        color: var(--green);
+      }
+      .mini-flip {
+        width: 130px;
+        height: 74px;
+        perspective: 400px;
+      }
+      .mini-flip i {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--line-s);
+        border-radius: var(--rx-md);
+        background:
+          radial-gradient(circle at 18% 16%, rgba(57, 232, 255, 0.1), transparent 40%),
+          rgba(10, 15, 30, 0.7);
+        transform: rotateY(26deg);
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        text-transform: uppercase;
+        font-style: normal;
+      }
+      .mini-rq {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 168px;
+      }
+      .mini-rq-pane {
+        display: grid;
+        gap: 6px;
+        flex: 1;
+        padding: 10px;
+        border-radius: var(--rx-sm);
+        border: 1px solid var(--line);
+        background: rgba(6, 10, 18, 0.5);
+      }
+      .mini-rq-pane i {
+        display: block;
+        height: 9px;
+        border-radius: 4px;
+        background: rgba(122, 143, 184, 0.18);
+      }
+      .mini-rq-pane--bad {
+        border-color: rgba(255, 77, 106, 0.25);
+      }
+      .mini-rq-pane--bad i:first-child {
+        background: rgba(255, 77, 106, 0.3);
+      }
+      .mini-rq-pane--good {
+        border-color: rgba(0, 255, 153, 0.25);
+      }
+      .mini-rq-pane--good i:first-child {
+        background: rgba(0, 255, 153, 0.32);
+      }
+      .mini-rq-vs {
+        color: var(--dim);
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      /* ---- colophon ---- */
+      .palette {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: clamp(24px, 3vw, 36px);
+      }
+      .chip {
+        border: 1px solid var(--line);
+        border-radius: var(--rx-md);
+        width: 92px;
+        padding: 8px;
+        display: grid;
+        gap: 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        color: var(--dim);
+      }
+      .chip i {
+        display: block;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .chip b {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .colophon-rows {
+        border-top: 1px solid var(--line);
+        margin-top: clamp(24px, 3vw, 36px);
+      }
+      .hub-foot {
+        border-top: 1px solid var(--line);
+        margin-top: var(--space-section-tight);
+        padding: 28px 0 44px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--dim);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+      }
+      .hub-foot a {
+        color: var(--muted);
+        transition: color 0.18s var(--ease);
+      }
+      .hub-foot a:hover {
+        color: var(--cyan);
+      }
+    </style>
+  </head>
+  <body>
+    <div aria-hidden="true" class="ambient ambient-a"></div>
+    <div aria-hidden="true" class="ambient ambient-b"></div>
+    <div aria-hidden="true" class="scanline"></div>
+
+    <header class="sc-top">
+      <div class="wrap">
+        <a class="sc-brand" href="https://pietro.works/">Pietro<sup>.works/showcase</sup></a>
+        <nav class="sc-crumb" aria-label="Stages">
+          <a href="index.html" aria-current="page">index</a>
+          <span class="sc-sep">·</span>
+          <a href="stages/01-accent.html">01</a>
+          <a href="stages/02-atoms.html">02</a>
+          <a href="stages/03-orbit.html">03</a>
+          <a href="stages/04-review-queue.html">04</a>
+          <a href="stages/05-modules.html">05</a>
+          <a href="stages/06-flip.html">06</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- ================= hero ================= -->
+      <section class="wrap hub-hero">
+        <div class="eyebrow"><span class="dot"></span> showcase.md · design record</div>
+        <h1>
+          Blueprint of
+          <br /><span class="acc" data-text="pietro.works">pietro.works</span>
+        </h1>
+        <p class="sub">
+          One page, taken apart. The site behind this repo is a single-page portfolio
+          built like the private tools it describes: near-black navy glass, one
+          luminous spectrum, monospace readouts, and motion that only moves when it
+          has something to say. Below, every section is read closely and the
+          signature constructions stand isolated on their own stages.
+        </p>
+      </section>
+
+      <!-- ================= voice ================= -->
+      <section class="band">
+        <div class="wrap">
+          <div class="hub-head" data-reveal>
+            <span class="hub-label">The voice</span>
+            <h2>Quiet authority, engineered</h2>
+            <p>
+              The design never raises its voice because it does not need to. Three
+              principles resolve almost every decision on the page.
+            </p>
+          </div>
+          <div class="voice-grid">
+            <div class="voice" data-reveal>
+              <span class="v-index">principle / 01</span>
+              <h3>Human judgment first</h3>
+              <p>
+                Every animation on the site ends the same way: a person makes the
+                call. Dashboards keep a human-review step lit, the review queue waits
+                for an approval stamp, and the orbit leaves the portrait untouched at
+                the center. The technology draws itself around the decision, never
+                over it.
+              </p>
+            </div>
+            <div class="voice" data-reveal>
+              <span class="v-index">principle / 02</span>
+              <h3>Engineered, not decorated</h3>
+              <p>
+                Nothing on the page is ornament. The dot matrix is a texture with a
+                mask, the ambient blobs are two radial gradients, and every label
+                that reads like machine output is machine-plausible: file names with
+                sizes, percentages with baselines, statuses that earn their color.
+              </p>
+            </div>
+            <div class="voice" data-reveal>
+              <span class="v-index">principle / 03</span>
+              <h3>One glow per view</h3>
+              <p>
+                The accent spectrum is a spotlight, not wallpaper. Each viewport gets
+                a single luminous moment: the hero phrase, the live dot, the meter at
+                full charge. When two things glow, nothing glows, so the page spends
+                its light carefully.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= fingerprint ================= -->
+      <section class="band">
+        <div class="wrap">
+          <div class="hub-head" data-reveal>
+            <span class="hub-label">The fingerprint</span>
+            <h2>Details that fakes always miss</h2>
+            <p>
+              Surface copies of this identity fail on the same six details. They are
+              small, byte-exact, and they carry most of the signature.
+            </p>
+          </div>
+          <div class="fp-grid">
+            <div class="fp" data-reveal>
+              <div class="fp-specimen">
+                <span class="fp-acc acc" data-text="glow">glow</span>
+              </div>
+              <div>
+                <h3>The accent is two layers</h3>
+                <p>
+                  Crisp gradient text in front, a blurred duplicate breathing behind
+                  it. Single-layer gradient text is the most common fake and always
+                  reads flat. Stage 01 explodes the construction.
+                </p>
+              </div>
+            </div>
+            <div class="fp" data-reveal>
+              <div class="fp-specimen">
+                <div class="hairline-demo">
+                  <div>
+                    <i style="background: rgba(57, 232, 255, 0.22)"></i>
+                    <span>line-s · cyan 22%</span>
+                  </div>
+                  <div>
+                    <i style="background: rgba(57, 232, 255, 0.1)"></i>
+                    <span>line · cyan 10%</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3>Hairlines are tinted, never gray</h3>
+                <p>
+                  Every border on the site is cyan at 10% or 22% opacity. A neutral
+                  gray 1px border is the fastest way to break the instrument-panel
+                  read.
+                </p>
+              </div>
+            </div>
+            <div class="fp" data-reveal>
+              <div class="fp-specimen">
+                <div class="mono-demo">
+                  <b>◇</b> validation-loop.js <i>4.2 kb</i>
+                </div>
+              </div>
+              <div>
+                <h3>Metadata speaks mono</h3>
+                <p>
+                  Indices, eyebrows, timestamps and file names are DM Mono. Sentences
+                  are DM Sans. The contrast between the two is the "this person ships
+                  code" signal.
+                </p>
+              </div>
+            </div>
+            <div class="fp" data-reveal>
+              <div class="fp-specimen">
+                <div class="depth-demo"><i></i></div>
+              </div>
+              <div>
+                <h3>Depth is colored</h3>
+                <p>
+                  Shadows tint toward navy, glows use the accent tokens, and the one
+                  green dot always carries its <code>0 0 9px</code> halo. A generic
+                  black drop shadow reads instantly off-brand.
+                </p>
+              </div>
+            </div>
+            <div class="fp" data-reveal>
+              <div class="fp-specimen">
+                <svg class="ease-demo" width="150" height="76" viewBox="0 0 150 76" aria-hidden="true">
+                  <line x1="0" y1="66" x2="33" y2="10" />
+                  <line x1="150" y1="10" x2="54" y2="10" />
+                  <path d="M0 66 C33 10, 54 10, 150 10" />
+                  <circle cx="0" cy="66" r="3" />
+                  <circle cx="150" cy="10" r="3" />
+                </svg>
+              </div>
+              <div>
+                <h3>One easing curve</h3>
+                <p>
+                  <code>cubic-bezier(.22, 1, .36, 1)</code> everywhere. Motion spends
+                  its speed early and decelerates with confidence. Never linear,
+                  never springy.
+                </p>
+              </div>
+            </div>
+            <div class="fp" data-reveal>
+              <div class="fp-specimen">
+                <div class="radii-demo">
+                  <i style="width: 74px; height: 74px; border-radius: 32px"></i>
+                  <i style="width: 60px; height: 60px; border-radius: 22px"></i>
+                  <i style="width: 46px; height: 46px; border-radius: 14px"></i>
+                  <i style="width: 34px; height: 34px; border-radius: 8px"></i>
+                </div>
+              </div>
+              <div>
+                <h3>Radii are large and specific</h3>
+                <p>
+                  32, 22, 14, 8. Pills are 999. There are no 4px web-default corners
+                  on big surfaces anywhere on the page.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= anatomy ================= -->
+      <section class="band">
+        <div class="wrap">
+          <div class="hub-head" data-reveal>
+            <span class="hub-label">Section by section</span>
+            <h2>A close read of the page</h2>
+            <p>
+              Eleven bands, one idea each. Every section states a claim and then
+              demonstrates it, usually with motion doing the arguing.
+            </p>
+          </div>
+          <div class="anatomy">
+            <div class="an-row" data-reveal>
+              <span class="an-index">01</span>
+              <div>
+                <h3>Navigation</h3>
+                <span class="an-tag">sticky pill · hairline</span>
+              </div>
+              <p>
+                A single floating pill: avatar, four anchors, one gradient call to
+                action. It stays a pill at every width because the site has one job
+                and the nav should not suggest otherwise.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">02</span>
+              <div>
+                <h3>Hero</h3>
+                <span class="an-tag">pointer tilt · count-up</span>
+              </div>
+              <p>
+                The claim leads from the left while a mock operations dashboard runs
+                on the right, counting processed work and cycling its pipeline. The
+                whole window tilts a few degrees toward the pointer. Enough to feel
+                alive, never enough to become a toy.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">03</span>
+              <div>
+                <h3>Metrics band</h3>
+                <span class="an-tag">spotlight · late reveal</span>
+              </div>
+              <p>
+                Four proof cards that trade numbers for mechanisms: hours become
+                minutes, the person keeps the call, no training deck, modules over
+                scripts. The band reveals only after it fully clears the viewport
+                edge, a deliberate beat later than everything else.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">04</span>
+              <div>
+                <h3>How I work</h3>
+                <span class="an-tag">9.6s cycle · pure css</span>
+              </div>
+              <p>
+                The portrait holds still while context, handoff and verified output
+                orbit it on a shared 9.6 second clock. The scene is the thesis of the
+                site drawn as choreography. Stage 03 takes it apart.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">05</span>
+              <div>
+                <h3>Capabilities</h3>
+                <span class="an-tag">stagger reveal · stroke icons</span>
+              </div>
+              <p>
+                Eight cards, one 1.5px stroke-icon system, at most two tags each.
+                Outcomes lead and tools follow, because a keyword wall would undo the
+                calm the rest of the page works for.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">06</span>
+              <div>
+                <h3>Architecture</h3>
+                <span class="an-tag">split demo · 7.5s loop</span>
+              </div>
+              <p>
+                An NDA banner concedes the best work cannot be shown, then proves the
+                shape of it anyway: a five-node flow diagram and an animated review
+                queue that plays manual chaos against the automated lane. On the
+                left, a blocked cursor mistypes and stalls. On the right, four stages
+                ship and an approval stamp lands.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">07</span>
+              <div>
+                <h3>Process</h3>
+                <span class="an-tag">icon wake · 330ms steps</span>
+              </div>
+              <p>
+                Four numbered steps from watching the human workflow to shipping a
+                real product. The icons wake in sequence as the row enters view, and
+                the copy insists on the part most portfolios skip: mapping before
+                automating.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">08</span>
+              <div>
+                <h3>Reliability</h3>
+                <span class="an-tag">ghost cursor · build loop</span>
+              </div>
+              <p>
+                A shelf of six module files, an empty canvas, and a synthetic cursor
+                that builds the system in front of you, wires it, acknowledges it and
+                clears it. The section claims modularity and then performs it. Stage
+                04 isolates the full choreography.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">09</span>
+              <div>
+                <h3>Toolkit</h3>
+                <span class="an-tag">3d flip · 720ms</span>
+              </div>
+              <p>
+                Five flip cards that serve two readers: named tools on the front for
+                the person who evaluates stacks, plain outcomes on the back for the
+                person who signs off. Stage 05 isolates the first card and its turn.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">10</span>
+              <div>
+                <h3>Experience</h3>
+                <span class="an-tag">accent rail · reveal</span>
+              </div>
+              <p>
+                Three blocks stand in for a timeline, each one a category of shipped
+                work rather than a parade of job titles. Most of the work lives under
+                NDA and the section says so plainly instead of gesturing at logos.
+              </p>
+            </div>
+            <div class="an-row" data-reveal>
+              <span class="an-index">11</span>
+              <div>
+                <h3>Contact</h3>
+                <span class="an-tag">canvas particles · orbit rings</span>
+              </div>
+              <p>
+                The portrait returns, this time inside a canvas of up to 118 orbiting
+                particles and two elliptical accent rings, drawn per frame and paused
+                the moment the section leaves the viewport. The ask stays one line:
+                email or LinkedIn, skip the sales deck.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= stages ================= -->
+      <section class="band">
+        <div class="wrap">
+          <div class="hub-head" data-reveal>
+            <span class="hub-label">The stages</span>
+            <h2>Six exhibits, isolated and running</h2>
+            <p>
+              Each stage lifts one construction out of the page, runs it live with
+              production values, and documents the numbers underneath it.
+            </p>
+          </div>
+          <div class="stage-grid">
+            <a class="stage-card" href="stages/01-accent.html" data-reveal>
+              <div class="sg-preview">
+                <span class="mini-acc acc" data-text="two layers">two layers</span>
+              </div>
+              <span class="sg-index">stage_01 · signature</span>
+              <div>
+                <h3>The gradient accent</h3>
+                <p>
+                  The hero phrase exploded into its crisp layer and its bloom, with a
+                  toggle to feel what the duplicate is worth.
+                </p>
+              </div>
+              <span class="sg-go">open stage →</span>
+            </a>
+            <a class="stage-card" href="stages/02-atoms.html" data-reveal>
+              <div class="sg-preview">
+                <span class="mini-eyebrow"><i></i> Available for new systems</span>
+              </div>
+              <span class="sg-index">stage_02 · atoms</span>
+              <div>
+                <h3>Interface atoms</h3>
+                <p>
+                  Eyebrows, buttons, tags, badges and chips on small pedestals, every
+                  hover state live and every value from production.
+                </p>
+              </div>
+              <span class="sg-go">open stage →</span>
+            </a>
+            <a class="stage-card" href="stages/03-orbit.html" data-reveal>
+              <div class="sg-preview">
+                <div class="mini-orbit" aria-hidden="true">
+                  <b></b><i></i><i></i><i></i>
+                </div>
+              </div>
+              <span class="sg-index">stage_03 · highlight</span>
+              <div>
+                <h3>The orbit</h3>
+                <p>
+                  The "How I work" scene running in isolation: signals arriving,
+                  constellation drawing, meter charging, burst and rebuild.
+                </p>
+              </div>
+              <span class="sg-go">open stage →</span>
+            </a>
+            <a class="stage-card" href="stages/04-review-queue.html" data-reveal>
+              <div class="sg-preview">
+                <div class="mini-rq" aria-hidden="true">
+                  <div class="mini-rq-pane mini-rq-pane--bad">
+                    <i></i><i></i>
+                  </div>
+                  <div class="mini-rq-vs">vs</div>
+                  <div class="mini-rq-pane mini-rq-pane--good">
+                    <i></i><i></i>
+                  </div>
+                </div>
+              </div>
+              <span class="sg-index">stage_04 · highlight</span>
+              <div>
+                <h3>The review queue</h3>
+                <p>
+                  Manual chaos and an automated pipeline racing the same task,
+                  side by side, on a shared 7.5 second clock.
+                </p>
+              </div>
+              <span class="sg-go">open stage →</span>
+            </a>
+            <a class="stage-card" href="stages/05-modules.html" data-reveal>
+              <div class="sg-preview">
+                <div class="mini-shelf" aria-hidden="true">
+                  <i><b>⬡</b> context-ingest.js</i>
+                  <i><b>◎</b> ai-handoff.js</i>
+                  <i><b>◇</b> validation-loop.js</i>
+                </div>
+              </div>
+              <span class="sg-index">stage_05 · highlight</span>
+              <div>
+                <h3>The module board</h3>
+                <p>
+                  The Reliability build loop with its ghost cursor, un-minified and
+                  annotated, plus a replay control.
+                </p>
+              </div>
+              <span class="sg-go">open stage →</span>
+            </a>
+            <a class="stage-card" href="stages/06-flip.html" data-reveal>
+              <div class="sg-preview">
+                <div class="mini-flip" aria-hidden="true"><i>plain terms</i></div>
+              </div>
+              <span class="sg-index">stage_06 · highlight</span>
+              <div>
+                <h3>The flip</h3>
+                <p>
+                  The Automation card turning between its two audiences: named
+                  tools on the front, plain outcomes on the back.
+                </p>
+              </div>
+              <span class="sg-go">open stage →</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= colophon ================= -->
+      <section class="band band--last">
+        <div class="wrap">
+          <div class="hub-head" data-reveal>
+            <span class="hub-label">Colophon</span>
+            <h2>The material list</h2>
+          </div>
+          <div class="palette" data-reveal aria-label="Palette">
+            <span class="chip"><i style="background: #060a12"></i><b>bg</b> #060a12</span>
+            <span class="chip"><i style="background: #0a0f1e"></i><b>bg2</b> #0a0f1e</span>
+            <span class="chip"><i style="background: #0e1525"></i><b>bg3</b> #0e1525</span>
+            <span class="chip"><i style="background: #eef4ff"></i><b>ink</b> #eef4ff</span>
+            <span class="chip"><i style="background: #7a8fb8"></i><b>muted</b> #7a8fb8</span>
+            <span class="chip"><i style="background: #3d4e6e"></i><b>dim</b> #3d4e6e</span>
+            <span class="chip"><i style="background: #39e8ff"></i><b>cyan</b> #39e8ff</span>
+            <span class="chip"><i style="background: #00ff99"></i><b>green</b> #00ff99</span>
+            <span class="chip"><i style="background: #a855f7"></i><b>purple</b> #a855f7</span>
+            <span class="chip"><i style="background: #c084fc"></i><b>pink</b> #c084fc</span>
+          </div>
+          <dl class="ledger colophon-rows" data-reveal>
+            <div class="ledger-row">
+              <dt>Type</dt>
+              <dd>Clash Display 600/700 · DM Sans 300–700 · DM Mono 400/500</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Motion</dt>
+              <dd>cubic-bezier(.22, 1, .36, 1) · micro .2s · entrances .4–.7s · ambient 2–3.4s</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Rhythm</dt>
+              <dd>4px base · sections clamp(80px, 8.5vw, 120px) · grid gap 24px</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Stack</dt>
+              <dd>one html file · one stylesheet · one script · no framework, no build step</dd>
+            </div>
+          </dl>
+          <footer class="hub-foot">
+            <span>Pietro Impagliazzo · <a href="https://pietro.works/">pietro.works</a></span>
+            <span>design record · 2026</span>
+          </footer>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-visible");
+                obs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.08 },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el, i) => {
+          el.style.transitionDelay = `${Math.min((i % 6) * 45, 240)}ms`;
+          obs.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>

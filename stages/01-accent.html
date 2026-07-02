@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Stage 01 · The gradient accent — pietro.works showcase</title>
+    <meta
+      name="description"
+      content="The signature two-layer gradient accent of pietro.works, isolated: crisp clipped text in front, a blurred duplicate breathing behind it."
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://api.fontshare.com" rel="preconnect" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared.css" />
+    <style>
+      /* ================================================================
+         The exhibited construction, verbatim from production styles.css.
+         The hero accent is an <em> carrying its own text twice: the
+         element is the crisp gradient-clipped layer, its ::after reads
+         data-text and becomes the blurred bloom behind it.
+         ================================================================ */
+      .acc-live {
+        z-index: 0;
+        color: transparent;
+        white-space: nowrap;
+        isolation: isolate;
+        font-style: normal;
+        background: linear-gradient(
+          105deg,
+          var(--cyan) 0%,
+          #8cf7ff 24%,
+          var(--green) 52%,
+          var(--purple) 78%,
+          var(--cyan) 100%
+        );
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 14px rgba(57, 232, 255, 0.22))
+          drop-shadow(0 0 24px rgba(0, 255, 153, 0.16));
+        -webkit-background-clip: text;
+        background-clip: text;
+        position: relative;
+      }
+      .acc-live:after {
+        content: attr(data-text);
+        z-index: -1;
+        pointer-events: none;
+        line-height: inherit;
+        background: linear-gradient(
+          105deg,
+          var(--cyan) 0%,
+          #8cf7ff 24%,
+          var(--green) 52%,
+          var(--purple) 78%,
+          var(--cyan) 100%
+        );
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        opacity: 0.22;
+        filter: blur(10px) saturate(1.12);
+        -webkit-background-clip: text;
+        background-clip: text;
+        position: absolute;
+        inset: 0;
+        transform: translateZ(0) scale(1.01);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .acc-live:after {
+          animation: 3.4s ease-in-out infinite heroTitleGlowPulse;
+        }
+      }
+      @keyframes heroTitleGlowPulse {
+        0%,
+        to {
+          opacity: 0.18;
+          filter: blur(9px) saturate(1.05);
+          transform: translateZ(0) scale(1.006);
+        }
+        50% {
+          opacity: 0.68;
+          filter: blur(16px) saturate(1.42);
+          transform: translateZ(0) scale(1.028);
+        }
+      }
+
+      /* Layer isolates for the exploded view */
+      .acc-crisp {
+        color: transparent;
+        white-space: nowrap;
+        background: linear-gradient(
+          105deg,
+          var(--cyan) 0%,
+          #8cf7ff 24%,
+          var(--green) 52%,
+          var(--purple) 78%,
+          var(--cyan) 100%
+        );
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+      .acc-bloom {
+        color: transparent;
+        white-space: nowrap;
+        background: linear-gradient(
+          105deg,
+          var(--cyan) 0%,
+          #8cf7ff 24%,
+          var(--green) 52%,
+          var(--purple) 78%,
+          var(--cyan) 100%
+        );
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+        opacity: 0.22;
+        filter: blur(10px) saturate(1.12);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .acc-bloom {
+          animation: 3.4s ease-in-out infinite bloomAlonePulse;
+        }
+      }
+      @keyframes bloomAlonePulse {
+        0%,
+        to {
+          opacity: 0.18;
+          filter: blur(9px) saturate(1.05);
+        }
+        50% {
+          opacity: 0.68;
+          filter: blur(16px) saturate(1.42);
+        }
+      }
+
+      /* Stage furniture */
+      .layer-stack {
+        display: grid;
+        gap: clamp(22px, 3.5vw, 36px);
+        justify-items: center;
+      }
+      .layer-row {
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+        width: 100%;
+      }
+      .layer-row.is-composite {
+        border-top: 1px solid var(--line);
+        padding-top: clamp(22px, 3.5vw, 36px);
+      }
+      .layer-label {
+        color: var(--dim);
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .layer-specimen {
+        font-family: "Clash Display", sans-serif;
+        font-weight: 600;
+        font-size: clamp(34px, 6.4vw, 72px);
+        letter-spacing: -0.02em;
+        line-height: 1.06;
+      }
+      .composite-wrap.no-bloom .acc-live:after {
+        display: none;
+      }
+      .composite-wrap.no-bloom .acc-live {
+        filter: none;
+      }
+      .stops {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 26px;
+      }
+      .stop {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 12px 5px 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .stop i {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div aria-hidden="true" class="ambient ambient-a"></div>
+    <div aria-hidden="true" class="ambient ambient-b"></div>
+    <div aria-hidden="true" class="scanline"></div>
+
+    <header class="sc-top">
+      <div class="wrap">
+        <a class="sc-brand" href="../index.html">Pietro<sup>.works/showcase</sup></a>
+        <nav class="sc-crumb" aria-label="Stages">
+          <a href="../index.html">index</a>
+          <span class="sc-sep">·</span>
+          <a href="01-accent.html" aria-current="page">01</a>
+          <a href="02-atoms.html">02</a>
+          <a href="03-orbit.html">03</a>
+          <a href="04-review-queue.html">04</a>
+          <a href="05-modules.html">05</a>
+          <a href="06-flip.html">06</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="band band--hero">
+        <div class="wrap">
+          <div class="stage-hero">
+            <div class="eyebrow"><span class="dot"></span> stage_01 · signature</div>
+            <h1>Two layers make the glow</h1>
+            <p class="sub">
+              The accent phrase in the hero is not one gradient text. It is the same
+              text twice: a crisp layer clipped to the spectrum in front, and a blurred
+              duplicate breathing behind it. Remove the duplicate and the word goes
+              flat. Blur the original instead and the word itself goes fuzzy. The
+              two-layer build is the whole trick.
+            </p>
+          </div>
+
+          <figure class="pedestal" aria-label="The two-layer accent, exploded into its parts">
+            <span class="pedestal-tick pedestal-tick--tl">accent / exploded</span>
+            <span class="pedestal-tick pedestal-tick--br">clash display 600</span>
+            <div class="layer-stack">
+              <div class="layer-row">
+                <span class="layer-label">layer 01 · crisp clip</span>
+                <span class="layer-specimen acc-crisp">teams wish existed</span>
+              </div>
+              <div class="layer-row">
+                <span class="layer-label">layer 02 · bloom, shown at its real values</span>
+                <span class="layer-specimen acc-bloom" aria-hidden="true">teams wish existed</span>
+              </div>
+              <div class="layer-row is-composite">
+                <span class="layer-label">composite · as shipped</span>
+                <div class="composite-wrap" id="compositeWrap">
+                  <em
+                    class="layer-specimen acc-live"
+                    data-text="teams wish existed"
+                    >teams wish existed</em
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="sc-controls">
+              <button class="sc-btn" id="bloomToggle" type="button" aria-pressed="true">
+                bloom: on
+              </button>
+            </div>
+          </figure>
+
+          <div class="readout" role="note">
+            <b>gradient 105deg</b><i>·</i><b>5 stops</b><i>·</i>
+            <b>bloom blur 9 to 16px</b><i>·</i><b>pulse 3.4s</b><i>·</i>
+            <b>opacity .18 to .68</b>
+          </div>
+
+          <div class="stops" aria-label="Gradient stops">
+            <span class="stop"><i style="background: #39e8ff"></i>#39e8ff · 0%</span>
+            <span class="stop"><i style="background: #8cf7ff"></i>#8cf7ff · 24%</span>
+            <span class="stop"><i style="background: #00ff99"></i>#00ff99 · 52%</span>
+            <span class="stop"><i style="background: #a855f7"></i>#a855f7 · 78%</span>
+            <span class="stop"><i style="background: #39e8ff"></i>#39e8ff · 100%</span>
+          </div>
+
+          <div class="notes">
+            <div class="note" data-reveal>
+              <span class="n-index">note / 01</span>
+              <h3>The duplicate is free</h3>
+              <p>
+                No second element in the markup. The <code>em</code> carries its own
+                copy in a <code>data-text</code> attribute, and the
+                <code>::after</code> pseudo-element reads it back with
+                <code>content: attr(data-text)</code>. One node in the DOM, two layers
+                on screen.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 02</span>
+              <h3>Alone, the bloom is almost nothing</h3>
+              <p>
+                At rest it sits at 18% opacity behind the text. You can barely see it
+                in the exploded view above, and that is the point. It is not a light
+                source, it is the difference between a printed word and a lit one.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 03</span>
+              <h3>The ramp loops back to cyan</h3>
+              <p>
+                The token gradient is a three-stop ramp, but the hero adds two stops:
+                a pale <code>#8cf7ff</code> at 24% to lift the first word, and a
+                return to cyan at 100% so the phrase ends as cool as it began. Long
+                phrases get a full spectrum pass without drowning in purple.
+              </p>
+            </div>
+            <div class="note" data-reveal>
+              <span class="n-index">note / 04</span>
+              <h3>The breath is the only loop</h3>
+              <p>
+                The bloom pulses between 18% and 68% opacity over 3.4 seconds while
+                the crisp layer never moves. The brand allows infinite loops only on
+                small ambient signals, and this is one of exactly two in the hero.
+              </p>
+            </div>
+          </div>
+
+          <dl class="ledger">
+            <div class="ledger-title">specimen ledger</div>
+            <div class="ledger-row">
+              <dt>Construction</dt>
+              <dd>em[data-text] + ::after(content: attr(data-text)) <em>· one DOM node</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Crisp layer</dt>
+              <dd>background-clip: text · drop-shadow 0 0 14px cyan-glow, 0 0 24px green-glow</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Bloom layer</dt>
+              <dd>opacity .22 · blur(10px) saturate(1.12) · scale(1.01) · z-index -1</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Pulse</dt>
+              <dd>heroTitleGlowPulse 3.4s ease-in-out infinite <em>· opacity .18→.68 · blur 9→16px</em></dd>
+            </div>
+            <div class="ledger-row">
+              <dt>Guardrail</dt>
+              <dd>never set background shorthand on a clipped element <em>· it wipes the clip</em></dd>
+            </div>
+          </dl>
+
+          <nav class="stage-foot" aria-label="Stage footer">
+            <a href="../index.html">← showcase index</a>
+            <span class="sf-mid">01 / 06 · the gradient accent</span>
+            <a href="02-atoms.html">02 · interface atoms →</a>
+          </nav>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const wrap = document.getElementById("compositeWrap");
+        const btn = document.getElementById("bloomToggle");
+        btn.addEventListener("click", () => {
+          const off = wrap.classList.toggle("no-bloom");
+          btn.setAttribute("aria-pressed", String(!off));
+          btn.textContent = off ? "bloom: off" : "bloom: on";
+        });
+
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("is-visible");
+                obs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.1 },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el, i) => {
+          el.style.transitionDelay = `${Math.min(i * 40, 200)}ms`;
+          obs.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>
