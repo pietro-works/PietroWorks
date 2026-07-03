@@ -22,20 +22,6 @@
     <link rel="stylesheet" href="shared.css" />
     <style>
       /* ---- hero accent: the production two-layer construction ---- */
-      .hub-hero {
-        padding-top: clamp(64px, 9vw, 120px);
-      }
-      .hub-hero h1 {
-        font-size: max(40px, min(6.6vw, 78px));
-        line-height: 1.05;
-      }
-      .hub-hero .sub {
-        color: var(--muted);
-        margin-top: 22px;
-        font-size: max(16px, min(1.9vw, 19px));
-        line-height: 1.65;
-        max-width: 640px;
-      }
       .acc {
         z-index: 0;
         color: transparent;
@@ -614,8 +600,7 @@
       <div class="wrap">
         <a class="sc-brand" href="https://pietro.works/">Pietro<sup>.works/showcase</sup></a>
         <nav class="sc-crumb" aria-label="Stages">
-          <a href="index.html" aria-current="page">index</a>
-          <span class="sc-sep">·</span>
+          <a href="index.html" aria-current="page">00</a>
           <a href="stages/01-accent.html">01</a>
           <a href="stages/02-atoms.html">02</a>
           <a href="stages/03-orbit.html">03</a>
@@ -628,19 +613,20 @@
 
     <main>
       <!-- ================= hero ================= -->
-      <section class="wrap hub-hero">
-        <div class="eyebrow"><span class="dot"></span> showcase.md · design record</div>
-        <h1>
-          Blueprint of
-          <br /><span class="acc" data-text="pietro.works">pietro.works</span>
-        </h1>
-        <p class="sub">
-          One page, taken apart. The site behind this repo is a single-page portfolio
-          built like the private tools it describes: near-black navy glass, one
-          luminous spectrum, monospace readouts, and motion that only moves when it
-          has something to say. Below, every section is read closely and the
-          signature constructions stand isolated on their own stages.
-        </p>
+      <section class="band band--hero">
+        <div class="wrap">
+          <div class="stage-hero">
+            <div class="eyebrow"><span class="dot"></span> showcase.md · design record</div>
+            <h1>Blueprint of <span class="acc" data-text="pietro.works">pietro.works</span></h1>
+            <p class="sub">
+              One page, taken apart. The site behind this repo is a single-page portfolio
+              built like the private tools it describes: near-black navy glass, one
+              luminous spectrum, monospace readouts, and motion that only moves when it
+              has something to say. Below, every section is read closely and the
+              signature constructions stand isolated on their own stages.
+            </p>
+          </div>
+        </div>
       </section>
 
       <!-- ================= voice ================= -->
